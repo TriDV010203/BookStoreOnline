@@ -1,3 +1,6 @@
+﻿
+using BookStoreOnline.API.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace BookStoreOnline.API
 {
@@ -6,7 +9,12 @@ namespace BookStoreOnline.API
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            // Nhớ thêm using thư viện này ở đầu file nhé:
+            // using Microsoft.EntityFrameworkCore;
+            // using BookStoreOnline.API.Models; // Sửa thành namespace chứa ApplicationDbContext của bạn
 
+            builder.Services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
             // Add services to the container.
 
             builder.Services.AddControllers();
