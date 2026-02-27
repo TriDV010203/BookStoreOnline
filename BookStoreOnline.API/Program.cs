@@ -1,7 +1,7 @@
 ﻿
+using System.Text.Json.Serialization;
 using BookStoreOnline.API.Models;
 using Microsoft.EntityFrameworkCore;
-
 namespace BookStoreOnline.API
 {
     public class Program
@@ -17,7 +17,14 @@ namespace BookStoreOnline.API
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
             // Add services to the container.
 
-            builder.Services.AddControllers();
+            
+
+            // Sửa dòng builder.Services.AddControllers() thành:
+            builder.Services.AddControllers().AddJsonOptions(options =>
+            {
+                // Bỏ qua lỗi vòng lặp khi convert dữ liệu sang JSON
+                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+            });
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
