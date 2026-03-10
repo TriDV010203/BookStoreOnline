@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v8.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v8.0": {
+      "BookStoreOnline.MVC/1.0.0": {
+        "runtime": {
+          "BookStoreOnline.MVC.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "BookStoreOnline.MVC/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
