@@ -15,9 +15,7 @@ B:\Project cá nhân\BookStoreOnline\BookStoreOnline.MVC\obj\Debug\net8.0\BookSt
 B:\Project cá nhân\BookStoreOnline\BookStoreOnline.MVC\obj\Debug\net8.0\BookStoreOnline.MVC.RazorAssemblyInfo.cache
 B:\Project cá nhân\BookStoreOnline\BookStoreOnline.MVC\obj\Debug\net8.0\BookStoreOnline.MVC.RazorAssemblyInfo.cs
 B:\Project cá nhân\BookStoreOnline\BookStoreOnline.MVC\obj\Debug\net8.0\BookStoreOnline.MVC.sourcelink.json
-B:\Project cá nhân\BookStoreOnline\BookStoreOnline.MVC\obj\Debug\net8.0\scopedcss\Views\Shared\_Layout.cshtml.rz.scp.css
 B:\Project cá nhân\BookStoreOnline\BookStoreOnline.MVC\obj\Debug\net8.0\scopedcss\bundle\BookStoreOnline.MVC.styles.css
-B:\Project cá nhân\BookStoreOnline\BookStoreOnline.MVC\obj\Debug\net8.0\scopedcss\projectbundle\BookStoreOnline.MVC.bundle.scp.css
 B:\Project cá nhân\BookStoreOnline\BookStoreOnline.MVC\obj\Debug\net8.0\staticwebassets.build.json
 B:\Project cá nhân\BookStoreOnline\BookStoreOnline.MVC\obj\Debug\net8.0\staticwebassets.development.json
 B:\Project cá nhân\BookStoreOnline\BookStoreOnline.MVC\obj\Debug\net8.0\staticwebassets.build.endpoints.json
@@ -27,9 +25,9 @@ B:\Project cá nhân\BookStoreOnline\BookStoreOnline.MVC\obj\Debug\net8.0\static
 B:\Project cá nhân\BookStoreOnline\BookStoreOnline.MVC\obj\Debug\net8.0\staticwebassets\msbuild.buildMultiTargeting.BookStoreOnline.MVC.props
 B:\Project cá nhân\BookStoreOnline\BookStoreOnline.MVC\obj\Debug\net8.0\staticwebassets\msbuild.buildTransitive.BookStoreOnline.MVC.props
 B:\Project cá nhân\BookStoreOnline\BookStoreOnline.MVC\obj\Debug\net8.0\staticwebassets.pack.json
-B:\Project cá nhân\BookStoreOnline\BookStoreOnline.MVC\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
 B:\Project cá nhân\BookStoreOnline\BookStoreOnline.MVC\obj\Debug\net8.0\BookStoreOnline.MVC.dll
 B:\Project cá nhân\BookStoreOnline\BookStoreOnline.MVC\obj\Debug\net8.0\refint\BookStoreOnline.MVC.dll
 B:\Project cá nhân\BookStoreOnline\BookStoreOnline.MVC\obj\Debug\net8.0\BookStoreOnline.MVC.pdb
 B:\Project cá nhân\BookStoreOnline\BookStoreOnline.MVC\obj\Debug\net8.0\BookStoreOnline.MVC.genruntimeconfig.cache
 B:\Project cá nhân\BookStoreOnline\BookStoreOnline.MVC\obj\Debug\net8.0\ref\BookStoreOnline.MVC.dll
+B:\Project cá nhân\BookStoreOnline\BookStoreOnline.MVC\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

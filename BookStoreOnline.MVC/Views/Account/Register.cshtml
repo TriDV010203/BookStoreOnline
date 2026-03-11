@@ -1,0 +1,154 @@
+@model BookStoreOnline.MVC.Models.RegisterViewModel
+@{
+    Layout = null; // Trang auth dùng layout riêng
+    ViewData["Title"] = "Đăng ký";
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - BookStore Online</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+</head>
+<body>
+<div class="auth-page">
+    <div class="auth-container">
+
+        <!-- Logo -->
+        <div class="auth-logo">
+            <a asp-controller="Home" asp-action="Index">
+                <span>📚</span> BookStore
+            </a>
+        </div>
+
+        <!-- Card -->
+        <div class="auth-card">
+            <h1 class="auth-title">Tạo tài khoản</h1>
+            <p class="auth-subtitle">Tham gia BookStore để khám phá kho sách phong phú.</p>
+
+            <!-- Server Error -->
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div asp-validation-summary="ModelOnly" class="alert-book alert-danger-book">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <span></span>
+                </div>
+            }
+
+            <!-- Form -->
+            <form asp-controller="Account" asp-action="Register" method="post">
+                @Html.AntiForgeryToken()
+
+                <!-- Full Name -->
+                <div class="form-group-book">
+                    <label asp-for="FullName" class="form-label-book">
+                        <i class="bi bi-person me-1"></i> Họ và tên
+                    </label>
+                    <input asp-for="FullName"
+                           class="form-control-book"
+                           placeholder="Nguyễn Văn A"
+                           autocomplete="name" />
+                    <span asp-validation-for="FullName" class="field-error"></span>
+                </div>
+
+                <!-- Email -->
+                <div class="form-group-book">
+                    <label asp-for="Email" class="form-label-book">
+                        <i class="bi bi-envelope me-1"></i> Email
+                    </label>
+                    <input asp-for="Email"
+                           class="form-control-book"
+                           placeholder="your@email.com"
+                           autocomplete="email"
+                           type="email" />
+                    <span asp-validation-for="Email" class="field-error"></span>
+                </div>
+
+                <!-- Password -->
+                <div class="form-group-book">
+                    <label asp-for="Password" class="form-label-book">
+                        <i class="bi bi-lock me-1"></i> Mật khẩu
+                    </label>
+                    <div style="position: relative;">
+                        <input asp-for="Password"
+                               id="passwordInput"
+                               class="form-control-book"
+                               placeholder="Tối thiểu 6 ký tự"
+                               autocomplete="new-password"
+                               style="padding-right: 3rem;"
+                               type="password" />
+                        <button type="button" id="togglePass"
+                                style="position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer;">
+                            <i class="bi bi-eye" id="eyeIcon"></i>
+                        </button>
+                    </div>
+                    <span asp-validation-for="Password" class="field-error"></span>
+                </div>
+
+                <!-- Confirm Password -->
+                <div class="form-group-book">
+                    <label asp-for="ConfirmPassword" class="form-label-book">
+                        <i class="bi bi-shield-lock me-1"></i> Xác nhận mật khẩu
+                    </label>
+                    <div style="position: relative;">
+                        <input asp-for="ConfirmPassword"
+                               id="confirmInput"
+                               class="form-control-book"
+                               placeholder="Nhập lại mật khẩu"
+                               autocomplete="new-password"
+                               style="padding-right: 3rem;"
+                               type="password" />
+                        <button type="button" id="toggleConfirm"
+                                style="position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer;">
+                            <i class="bi bi-eye" id="eyeIconConfirm"></i>
+                        </button>
+                    </div>
+                    <span asp-validation-for="ConfirmPassword" class="field-error"></span>
+                </div>
+
+                <!-- Submit -->
+                <button type="submit" class="btn-auth-submit mt-1">
+                    <i class="bi bi-person-plus me-2"></i>Tạo tài khoản
+                </button>
+            </form>
+
+            <!-- Switch -->
+            <div class="auth-switch">
+                Đã có tài khoản?
+                <a asp-controller="Account" asp-action="Login">Đăng nhập ngay</a>
+            </div>
+
+            <div class="auth-switch mt-2">
+                <a asp-controller="Home" asp-action="Index" style="color: var(--text-muted); font-size: 0.82rem;">
+                    <i class="bi bi-arrow-left me-1"></i>Về trang chủ
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js"></script>
+<script>
+    // Toggle password visibility
+    function togglePassword(inputId, iconId) {
+        var input = document.getElementById(inputId);
+        var icon = document.getElementById(iconId);
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.className = 'bi bi-eye-slash';
+        } else {
+            input.type = 'password';
+            icon.className = 'bi bi-eye';
+        }
+    }
+    document.getElementById('togglePass').addEventListener('click', () => togglePassword('passwordInput', 'eyeIcon'));
+    document.getElementById('toggleConfirm').addEventListener('click', () => togglePassword('confirmInput', 'eyeIconConfirm'));
+</script>
+</body>
+</html>

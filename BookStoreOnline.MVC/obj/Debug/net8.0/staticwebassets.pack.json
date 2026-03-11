@@ -1,10 +1,6 @@
 {
   "Files": [
     {
-      "Id": "B:\\Project cá nhân\\BookStoreOnline\\BookStoreOnline.MVC\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\BookStoreOnline.MVC.bundle.scp.css",
-      "PackagePath": "staticwebassets\\BookStoreOnline.MVC.uvbrfw7j15.bundle.scp.css"
-    },
-    {
       "Id": "B:\\Project cá nhân\\BookStoreOnline\\BookStoreOnline.MVC\\wwwroot\\css\\site.css",
       "PackagePath": "staticwebassets\\css\\site.css"
     },

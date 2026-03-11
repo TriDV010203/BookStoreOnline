@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "Ilm/6dhmyeprCI2ndFPwcn7VWcTDHoxGEw5CkU/ttAE=",
+  "Hash": "328cbnebbfUwGistbjE9UbqMLKibL2JrUUTEFB5iCHk=",
   "Source": "BookStoreOnline.MVC",
   "BasePath": "_content/BookStoreOnline.MVC",
   "Mode": "Default",
@@ -17,48 +17,6 @@
   ],
   "Assets": [
     {
-      "Identity": "B:\\Project cá nhân\\BookStoreOnline\\BookStoreOnline.MVC\\obj\\Debug\\net8.0\\scopedcss\\bundle\\BookStoreOnline.MVC.styles.css",
-      "SourceId": "BookStoreOnline.MVC",
-      "SourceType": "Computed",
-      "ContentRoot": "B:\\Project cá nhân\\BookStoreOnline\\BookStoreOnline.MVC\\obj\\Debug\\net8.0\\scopedcss\\bundle\\",
-      "BasePath": "_content/BookStoreOnline.MVC",
-      "RelativePath": "BookStoreOnline.MVC#[.{fingerprint}]?.styles.css",
-      "AssetKind": "All",
-      "AssetMode": "CurrentProject",
-      "AssetRole": "Primary",
-      "AssetMergeBehavior": "",
-      "AssetMergeSource": "",
-      "RelatedAsset": "",
-      "AssetTraitName": "ScopedCss",
-      "AssetTraitValue": "ApplicationBundle",
-      "Fingerprint": "uvbrfw7j15",
-      "Integrity": "6pPlGnjlqD9E8xfLbE8pjdiE/zM8LkXK3b6kNNlpAUM=",
-      "CopyToOutputDirectory": "Never",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "B:\\Project cá nhân\\BookStoreOnline\\BookStoreOnline.MVC\\obj\\Debug\\net8.0\\scopedcss\\bundle\\BookStoreOnline.MVC.styles.css"
-    },
-    {
-      "Identity": "B:\\Project cá nhân\\BookStoreOnline\\BookStoreOnline.MVC\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\BookStoreOnline.MVC.bundle.scp.css",
-      "SourceId": "BookStoreOnline.MVC",
-      "SourceType": "Computed",
-      "ContentRoot": "B:\\Project cá nhân\\BookStoreOnline\\BookStoreOnline.MVC\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\",
-      "BasePath": "_content/BookStoreOnline.MVC",
-      "RelativePath": "BookStoreOnline.MVC#[.{fingerprint}]!.bundle.scp.css",
-      "AssetKind": "All",
-      "AssetMode": "Reference",
-      "AssetRole": "Primary",
-      "AssetMergeBehavior": "",
-      "AssetMergeSource": "",
-      "RelatedAsset": "",
-      "AssetTraitName": "ScopedCss",
-      "AssetTraitValue": "ProjectBundle",
-      "Fingerprint": "uvbrfw7j15",
-      "Integrity": "6pPlGnjlqD9E8xfLbE8pjdiE/zM8LkXK3b6kNNlpAUM=",
-      "CopyToOutputDirectory": "Never",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "B:\\Project cá nhân\\BookStoreOnline\\BookStoreOnline.MVC\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\BookStoreOnline.MVC.bundle.scp.css"
-    },
-    {
       "Identity": "B:\\Project cá nhân\\BookStoreOnline\\BookStoreOnline.MVC\\wwwroot\\css\\site.css",
       "SourceId": "BookStoreOnline.MVC",
       "SourceType": "Discovered",
@@ -73,8 +31,8 @@
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
-      "Fingerprint": "c2tiyv64ts",
-      "Integrity": "pAGv4ietcJNk/EwsQZ5BN9+K4MuNYS2a9wl4Jw+q9D0=",
+      "Fingerprint": "ixxg8icosa",
+      "Integrity": "xl8X/bayN6JLZAV4igz5UNPdBoQmzExY/FacmhH852I=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\css\\site.css"
@@ -1321,215 +1279,6 @@
   ],
   "Endpoints": [
     {
-      "Route": "BookStoreOnline.MVC.bundle.scp.css",
-      "AssetFile": "B:\\Project cá nhân\\BookStoreOnline\\BookStoreOnline.MVC\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\BookStoreOnline.MVC.bundle.scp.css",
-      "Selectors": [],
-      "ResponseHeaders": [
-        {
-          "Name": "Accept-Ranges",
-          "Value": "bytes"
-        },
-        {
-          "Name": "Content-Length",
-          "Value": "1137"
-        },
-        {
-          "Name": "Content-Type",
-          "Value": "text/css"
-        },
-        {
-          "Name": "ETag",
-          "Value": "\"6pPlGnjlqD9E8xfLbE8pjdiE/zM8LkXK3b6kNNlpAUM=\""
-        },
-        {
-          "Name": "Last-Modified",
-          "Value": "Tue, 10 Mar 2026 18:05:46 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "no-cache"
-        }
-      ],
-      "EndpointProperties": [
-        {
-          "Name": "integrity",
-          "Value": "sha256-6pPlGnjlqD9E8xfLbE8pjdiE/zM8LkXK3b6kNNlpAUM="
-        }
-      ]
-    },
-    {
-      "Route": "BookStoreOnline.MVC.styles.css",
-      "AssetFile": "B:\\Project cá nhân\\BookStoreOnline\\BookStoreOnline.MVC\\obj\\Debug\\net8.0\\scopedcss\\bundle\\BookStoreOnline.MVC.styles.css",
-      "Selectors": [],
-      "ResponseHeaders": [
-        {
-          "Name": "Accept-Ranges",
-          "Value": "bytes"
-        },
-        {
-          "Name": "Content-Length",
-          "Value": "1137"
-        },
-        {
-          "Name": "Content-Type",
-          "Value": "text/css"
-        },
-        {
-          "Name": "ETag",
-          "Value": "\"6pPlGnjlqD9E8xfLbE8pjdiE/zM8LkXK3b6kNNlpAUM=\""
-        },
-        {
-          "Name": "Last-Modified",
-          "Value": "Tue, 10 Mar 2026 18:05:46 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "no-cache"
-        }
-      ],
-      "EndpointProperties": [
-        {
-          "Name": "integrity",
-          "Value": "sha256-6pPlGnjlqD9E8xfLbE8pjdiE/zM8LkXK3b6kNNlpAUM="
-        }
-      ]
-    },
-    {
-      "Route": "BookStoreOnline.MVC.uvbrfw7j15.bundle.scp.css",
-      "AssetFile": "B:\\Project cá nhân\\BookStoreOnline\\BookStoreOnline.MVC\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\BookStoreOnline.MVC.bundle.scp.css",
-      "Selectors": [],
-      "ResponseHeaders": [
-        {
-          "Name": "Accept-Ranges",
-          "Value": "bytes"
-        },
-        {
-          "Name": "Content-Length",
-          "Value": "1137"
-        },
-        {
-          "Name": "Content-Type",
-          "Value": "text/css"
-        },
-        {
-          "Name": "ETag",
-          "Value": "\"6pPlGnjlqD9E8xfLbE8pjdiE/zM8LkXK3b6kNNlpAUM=\""
-        },
-        {
-          "Name": "Last-Modified",
-          "Value": "Tue, 10 Mar 2026 18:05:46 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "max-age=31536000, immutable"
-        }
-      ],
-      "EndpointProperties": [
-        {
-          "Name": "fingerprint",
-          "Value": "uvbrfw7j15"
-        },
-        {
-          "Name": "label",
-          "Value": "BookStoreOnline.MVC.bundle.scp.css"
-        },
-        {
-          "Name": "integrity",
-          "Value": "sha256-6pPlGnjlqD9E8xfLbE8pjdiE/zM8LkXK3b6kNNlpAUM="
-        }
-      ]
-    },
-    {
-      "Route": "BookStoreOnline.MVC.uvbrfw7j15.styles.css",
-      "AssetFile": "B:\\Project cá nhân\\BookStoreOnline\\BookStoreOnline.MVC\\obj\\Debug\\net8.0\\scopedcss\\bundle\\BookStoreOnline.MVC.styles.css",
-      "Selectors": [],
-      "ResponseHeaders": [
-        {
-          "Name": "Accept-Ranges",
-          "Value": "bytes"
-        },
-        {
-          "Name": "Content-Length",
-          "Value": "1137"
-        },
-        {
-          "Name": "Content-Type",
-          "Value": "text/css"
-        },
-        {
-          "Name": "ETag",
-          "Value": "\"6pPlGnjlqD9E8xfLbE8pjdiE/zM8LkXK3b6kNNlpAUM=\""
-        },
-        {
-          "Name": "Last-Modified",
-          "Value": "Tue, 10 Mar 2026 18:05:46 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "max-age=31536000, immutable"
-        }
-      ],
-      "EndpointProperties": [
-        {
-          "Name": "fingerprint",
-          "Value": "uvbrfw7j15"
-        },
-        {
-          "Name": "label",
-          "Value": "BookStoreOnline.MVC.styles.css"
-        },
-        {
-          "Name": "integrity",
-          "Value": "sha256-6pPlGnjlqD9E8xfLbE8pjdiE/zM8LkXK3b6kNNlpAUM="
-        }
-      ]
-    },
-    {
-      "Route": "css/site.c2tiyv64ts.css",
-      "AssetFile": "B:\\Project cá nhân\\BookStoreOnline\\BookStoreOnline.MVC\\wwwroot\\css\\site.css",
-      "Selectors": [],
-      "ResponseHeaders": [
-        {
-          "Name": "Accept-Ranges",
-          "Value": "bytes"
-        },
-        {
-          "Name": "Content-Length",
-          "Value": "362"
-        },
-        {
-          "Name": "Content-Type",
-          "Value": "text/css"
-        },
-        {
-          "Name": "ETag",
-          "Value": "\"pAGv4ietcJNk/EwsQZ5BN9+K4MuNYS2a9wl4Jw+q9D0=\""
-        },
-        {
-          "Name": "Last-Modified",
-          "Value": "Mon, 09 Mar 2026 19:02:26 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "max-age=31536000, immutable"
-        }
-      ],
-      "EndpointProperties": [
-        {
-          "Name": "fingerprint",
-          "Value": "c2tiyv64ts"
-        },
-        {
-          "Name": "label",
-          "Value": "css/site.css"
-        },
-        {
-          "Name": "integrity",
-          "Value": "sha256-pAGv4ietcJNk/EwsQZ5BN9+K4MuNYS2a9wl4Jw+q9D0="
-        }
-      ]
-    },
-    {
       "Route": "css/site.css",
       "AssetFile": "B:\\Project cá nhân\\BookStoreOnline\\BookStoreOnline.MVC\\wwwroot\\css\\site.css",
       "Selectors": [],
@@ -1540,7 +1289,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "362"
+          "Value": "21461"
         },
         {
           "Name": "Content-Type",
@@ -1548,11 +1297,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"pAGv4ietcJNk/EwsQZ5BN9+K4MuNYS2a9wl4Jw+q9D0=\""
+          "Value": "\"xl8X/bayN6JLZAV4igz5UNPdBoQmzExY/FacmhH852I=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Mon, 09 Mar 2026 19:02:26 GMT"
+          "Value": "Wed, 11 Mar 2026 12:54:28 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -1562,7 +1311,52 @@
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-pAGv4ietcJNk/EwsQZ5BN9+K4MuNYS2a9wl4Jw+q9D0="
+          "Value": "sha256-xl8X/bayN6JLZAV4igz5UNPdBoQmzExY/FacmhH852I="
+        }
+      ]
+    },
+    {
+      "Route": "css/site.ixxg8icosa.css",
+      "AssetFile": "B:\\Project cá nhân\\BookStoreOnline\\BookStoreOnline.MVC\\wwwroot\\css\\site.css",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "21461"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"xl8X/bayN6JLZAV4igz5UNPdBoQmzExY/FacmhH852I=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Wed, 11 Mar 2026 12:54:28 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "ixxg8icosa"
+        },
+        {
+          "Name": "label",
+          "Value": "css/site.css"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-xl8X/bayN6JLZAV4igz5UNPdBoQmzExY/FacmhH852I="
         }
       ]
     },

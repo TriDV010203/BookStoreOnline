@@ -1,8 +1,233 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model List<BookStoreOnline.MVC.Models.BookViewModel>
+@{
+    ViewData["Title"] = "Trang chủ";
+    var searchVal = ViewData["Search"]?.ToString() ?? "";
+    var isLoggedIn = Context.Session.GetString("UserEmail") != null;
+    var userName = Context.Session.GetString("UserFullName") ?? "";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<!-- ===== HERO SECTION ===== -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-7">
+                <h1 class="hero-title">
+                    Khám phá thế giới
+                    <span class="accent">tri thức vô hạn</span>
+                </h1>
+                <p class="hero-subtitle">
+                    Hàng nghìn đầu sách chất lượng cao, từ sách văn học đến khoa học, 
+                    kinh doanh và phát triển bản thân — tất cả chỉ trong một nơi.
+                </p>
+
+                @if (isLoggedIn)
+                {
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="user-avatar-nav" style="width: 44px; height: 44px; font-size: 1rem;">
+                            @userName[0].ToString().ToUpper()
+                        </div>
+                        <div>
+                            <div style="font-size: 0.85rem; color: var(--text-muted);">Xin chào,</div>
+                            <div style="font-weight: 600; color: var(--text-light);">@userName 👋</div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="d-flex gap-3 flex-wrap">
+                        <a asp-controller="Account" asp-action="Register"
+                           class="btn-nav-register" style="padding: 0.75rem 2rem; font-size: 1rem; border-radius: 30px; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
+                            <i class="bi bi-person-plus"></i> Đăng ký miễn phí
+                        </a>
+                        <a asp-controller="Account" asp-action="Login"
+                           class="btn-nav-login" style="padding: 0.75rem 2rem; font-size: 1rem; border-radius: 30px; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
+                            <i class="bi bi-box-arrow-in-right"></i> Đăng nhập
+                        </a>
+                    </div>
+                }
+
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">@Model.Count+</span>
+                        <span class="stat-label">Đầu sách</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">100%</span>
+                        <span class="stat-label">Chính hãng</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">24/7</span>
+                        <span class="stat-label">Hỗ trợ</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-5 d-none d-md-flex justify-content-center">
+                <div class="hero-image-zone">
+                    <div class="book-stack">
+                        <div class="book-card-deco b1"></div>
+                        <div class="book-card-deco b2"></div>
+                        <div class="book-card-deco b3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== SEARCH SECTION ===== -->
+<section class="search-section">
+    <div class="container">
+        <form method="get" asp-controller="Home" asp-action="Index" class="search-form">
+            <input type="text"
+                   name="search"
+                   value="@searchVal"
+                   class="search-input"
+                   placeholder="🔍  Tìm kiếm theo tên sách, tác giả..." />
+            <button type="submit" class="btn-search">
+                <i class="bi bi-search me-1"></i> Tìm kiếm
+            </button>
+            @if (!string.IsNullOrEmpty(searchVal))
+            {
+                <a asp-controller="Home" asp-action="Index"
+                   style="display: flex; align-items: center; color: var(--text-muted); font-size: 0.85rem; white-space: nowrap;">
+                    <i class="bi bi-x-circle me-1"></i> Xóa
+                </a>
+            }
+        </form>
+    </div>
+</section>
+
+<!-- ===== BOOKS SECTION ===== -->
+<section class="books-section">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">
+                @if (!string.IsNullOrEmpty(searchVal))
+                {
+                    <span>Kết quả cho "<span class="gold">@searchVal</span>"</span>
+                }
+                else
+                {
+                    <span>Tất cả <span class="gold">sách</span></span>
+                }
+            </h2>
+            <span class="books-count">
+                <i class="bi bi-book me-1"></i>@Model.Count cuốn sách
+            </span>
+        </div>
+
+        @if (Model == null || Model.Count == 0)
+        {
+            <div class="empty-state">
+                <div class="empty-icon">📭</div>
+                <h4>Không tìm thấy sách nào</h4>
+                <p>
+                    @if (!string.IsNullOrEmpty(searchVal))
+                    {
+                        <span>Không có kết quả cho "@searchVal". Hãy thử từ khóa khác.</span>
+                    }
+                    else
+                    {
+                        <span>Chưa có sách nào trong hệ thống. Vui lòng quay lại sau.</span>
+                    }
+                </p>
+                @if (!string.IsNullOrEmpty(searchVal))
+                {
+                    <a asp-controller="Home" asp-action="Index" style="color: var(--primary);">
+                        <i class="bi bi-arrow-left me-1"></i> Xem tất cả sách
+                    </a>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="row g-4">
+                @foreach (var book in Model)
+                {
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <div class="book-card">
+                            <!-- Book Cover -->
+                            <div class="book-card-img">
+                                @if (!string.IsNullOrEmpty(book.ImageUrl))
+                                {
+                                    <img src="@book.ImageUrl" alt="@book.Title" loading="lazy" />
+                                }
+                                else
+                                {
+                                    <div class="book-placeholder-icon">📖</div>
+                                }
+                                <span class="book-category-badge">@book.CategoryName</span>
+                            </div>
+
+                            <!-- Book Body -->
+                            <div class="book-card-body">
+                                <h3 class="book-title" title="@book.Title">@book.Title</h3>
+                                <p class="book-author">bởi <span>@book.Author</span></p>
+                                <p class="book-desc">@book.Description</p>
+
+                                <div class="book-footer">
+                                    <span class="book-price">
+                                        @book.Price.ToString("N0")₫
+                                    </span>
+                                    <span class="book-stock @(book.StockQuantity > 0 ? "in-stock" : "out-stock")">
+                                        @if (book.StockQuantity > 0)
+                                        {
+                                            <i class="bi bi-check-circle-fill me-1"></i>
+                                            <span>Còn hàng</span>
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-x-circle-fill me-1"></i>
+                                            <span>Hết hàng</span>
+                                        }
+                                    </span>
+                                </div>
+
+                                @if (isLoggedIn)
+                                {
+                                    <button class="btn-add-cart" onclick="addToCartNotify('@book.Title')">
+                                        <i class="bi bi-cart-plus me-1"></i> Thêm vào giỏ
+                                    </button>
+                                }
+                                else
+                                {
+                                    <a asp-controller="Account" asp-action="Login"
+                                       class="btn-add-cart" style="display: block; text-align: center; text-decoration: none;">
+                                        <i class="bi bi-box-arrow-in-right me-1"></i> Đăng nhập để mua
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</section>
+
+@section Scripts {
+<script>
+    function addToCartNotify(title) {
+        // Toast thông báo thêm vào giỏ (UI placeholder, backend sẽ implement sau)
+        var container = document.createElement('div');
+        container.className = 'toast-container-book';
+        container.style.cssText = 'position:fixed;top:1.2rem;right:1.2rem;z-index:9999';
+
+        var toast = document.createElement('div');
+        toast.className = 'toast-book success';
+        toast.innerHTML = `
+            <i class="bi bi-cart-check-fill" style="color:#4ade80;font-size:1.1rem;flex-shrink:0;"></i>
+            <span class="toast-text">Đã thêm "<strong>${title}</strong>" vào giỏ hàng!</span>
+            <button class="toast-close" onclick="this.closest('.toast-container-book').remove()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        `;
+        container.appendChild(toast);
+        document.body.appendChild(container);
+        setTimeout(() => {
+            toast.style.animation = 'slideOut 0.3s ease forwards';
+            setTimeout(() => container.remove(), 350);
+        }, 3000);
+    }
+</script>
+}
