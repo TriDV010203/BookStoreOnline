@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "New Profile",
+    "Projects": [
+      {
+        "Path": "BookStoreOnline.API\\BookStoreOnline.API.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "BookStoreOnline.MVC\\BookStoreOnline.MVC.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

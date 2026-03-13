@@ -1,0 +1,54 @@
+@model BookStoreOnline.MVC.Models.CategoryCreateViewModel
+@{
+    ViewData["Title"] = "Sửa Danh mục";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="page-header">
+    <div>
+        <div class="page-header-title">✏️ Sửa Danh mục</div>
+        <div class="page-header-sub">Cập nhật thông tin danh mục</div>
+    </div>
+    <a asp-controller="Admin" asp-action="Categories" class="btn-admin-secondary">
+        <i class="bi bi-arrow-left"></i> Quay lại
+    </a>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="admin-card">
+            <form asp-controller="Admin" asp-action="CategoryEdit" asp-route-id="@Model.Id" method="post">
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly" class="admin-error mb-3"></div>
+
+                <div class="admin-form-group">
+                    <label asp-for="Name" class="admin-label"></label>
+                    <input asp-for="Name" class="admin-input @(ViewData.ModelState["Name"]?.Errors.Any() == true ? "is-invalid" : "")"
+                           placeholder="VD: Văn học, Khoa học, Kinh tế..." />
+                    <span asp-validation-for="Name" class="admin-error"></span>
+                </div>
+
+                <div class="admin-form-group">
+                    <label asp-for="Description" class="admin-label"></label>
+                    <textarea asp-for="Description" class="admin-input"
+                              placeholder="Mô tả ngắn về danh mục này..."></textarea>
+                    <span asp-validation-for="Description" class="admin-error"></span>
+                </div>
+
+                <div class="d-flex gap-3 mt-4">
+                    <button type="submit" class="btn-admin-primary">
+                        <i class="bi bi-check-lg"></i> Cập nhật
+                    </button>
+                    <a asp-controller="Admin" asp-action="Categories" class="btn-admin-secondary">
+                        Hủy
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -8,11 +8,16 @@ namespace BookStoreOnline.MVC.Services
     public class ApiService : IApiService
     {
         private readonly HttpClient _httpClient;
+        private readonly JsonSerializerOptions _jsonOptions = new() { PropertyNameCaseInsensitive = true };
 
         public ApiService(HttpClient httpClient)
         {
             _httpClient = httpClient;
         }
+
+        // =====================================================================
+        // BOOKS
+        // =====================================================================
 
         public async Task<List<BookViewModel>> GetBooksAsync()
         {
@@ -21,49 +26,180 @@ namespace BookStoreOnline.MVC.Services
                 var response = await _httpClient.GetAsync("api/books");
                 if (response.IsSuccessStatusCode)
                 {
-                    var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-                    var books = await response.Content.ReadFromJsonAsync<List<BookViewModel>>(options);
+                    var books = await response.Content.ReadFromJsonAsync<List<BookViewModel>>(_jsonOptions);
                     if (books != null)
                     {
-                        // Map category name nếu có
                         foreach (var book in books)
-                        {
                             if (book.CategoryName == null)
                                 book.CategoryName = "Chưa phân loại";
-                        }
                         return books;
                     }
                 }
                 return new List<BookViewModel>();
             }
-            catch
-            {
-                return new List<BookViewModel>();
-            }
+            catch { return new List<BookViewModel>(); }
         }
 
-        public async Task<(bool success, string message, UserSessionData? user)> LoginAsync(LoginViewModel model)
+        public async Task<BookViewModel?> GetBookByIdAsync(int id)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"api/books/{id}");
+                if (response.IsSuccessStatusCode)
+                    return await response.Content.ReadFromJsonAsync<BookViewModel>(_jsonOptions);
+                return null;
+            }
+            catch { return null; }
+        }
+
+        public async Task<(bool success, string message)> CreateBookAsync(BookCreateViewModel model)
         {
             try
             {
                 var payload = new
                 {
-                    email = model.Email,
-                    password = model.Password
+                    title = model.Title,
+                    author = model.Author,
+                    description = model.Description,
+                    price = model.Price,
+                    stockQuantity = model.StockQuantity,
+                    imageUrl = model.ImageUrl,
+                    categoryId = model.CategoryId
                 };
+                var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
+                var response = await _httpClient.PostAsync("api/books", content);
+                if (response.IsSuccessStatusCode)
+                    return (true, "Thêm sách thành công!");
+                var err = await response.Content.ReadAsStringAsync();
+                return (false, err.Trim('"'));
+            }
+            catch (Exception ex) { return (false, $"Lỗi kết nối: {ex.Message}"); }
+        }
 
-                var content = new StringContent(
-                    JsonSerializer.Serialize(payload),
-                    Encoding.UTF8,
-                    "application/json"
-                );
+        public async Task<(bool success, string message)> UpdateBookAsync(int id, BookCreateViewModel model)
+        {
+            try
+            {
+                var payload = new
+                {
+                    id,
+                    title = model.Title,
+                    author = model.Author,
+                    description = model.Description,
+                    price = model.Price,
+                    stockQuantity = model.StockQuantity,
+                    imageUrl = model.ImageUrl,
+                    categoryId = model.CategoryId
+                };
+                var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
+                var response = await _httpClient.PutAsync($"api/books/{id}", content);
+                if (response.IsSuccessStatusCode)
+                    return (true, "Cập nhật sách thành công!");
+                var err = await response.Content.ReadAsStringAsync();
+                return (false, err.Trim('"'));
+            }
+            catch (Exception ex) { return (false, $"Lỗi kết nối: {ex.Message}"); }
+        }
 
-                var response = await _httpClient.PostAsync("api/users/login", content);
+        public async Task<(bool success, string message)> DeleteBookAsync(int id)
+        {
+            try
+            {
+                var response = await _httpClient.DeleteAsync($"api/books/{id}");
+                if (response.IsSuccessStatusCode)
+                    return (true, "Xóa sách thành công!");
+                return (false, "Không thể xóa sách.");
+            }
+            catch (Exception ex) { return (false, $"Lỗi kết nối: {ex.Message}"); }
+        }
 
+        // =====================================================================
+        // CATEGORIES
+        // =====================================================================
+
+        public async Task<List<CategoryViewModel>> GetCategoriesAsync()
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync("api/categories");
                 if (response.IsSuccessStatusCode)
                 {
-                    var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-                    var userData = await response.Content.ReadFromJsonAsync<UserSessionData>(options);
+                    var cats = await response.Content.ReadFromJsonAsync<List<CategoryViewModel>>(_jsonOptions);
+                    return cats ?? new List<CategoryViewModel>();
+                }
+                return new List<CategoryViewModel>();
+            }
+            catch { return new List<CategoryViewModel>(); }
+        }
+
+        public async Task<CategoryViewModel?> GetCategoryByIdAsync(int id)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"api/categories/{id}");
+                if (response.IsSuccessStatusCode)
+                    return await response.Content.ReadFromJsonAsync<CategoryViewModel>(_jsonOptions);
+                return null;
+            }
+            catch { return null; }
+        }
+
+        public async Task<(bool success, string message)> CreateCategoryAsync(CategoryCreateViewModel model)
+        {
+            try
+            {
+                var payload = new { name = model.Name, description = model.Description };
+                var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
+                var response = await _httpClient.PostAsync("api/categories", content);
+                if (response.IsSuccessStatusCode)
+                    return (true, "Thêm danh mục thành công!");
+                var err = await response.Content.ReadAsStringAsync();
+                return (false, err.Trim('"'));
+            }
+            catch (Exception ex) { return (false, $"Lỗi kết nối: {ex.Message}"); }
+        }
+
+        public async Task<(bool success, string message)> UpdateCategoryAsync(int id, CategoryCreateViewModel model)
+        {
+            try
+            {
+                var payload = new { id, name = model.Name, description = model.Description };
+                var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
+                var response = await _httpClient.PutAsync($"api/categories/{id}", content);
+                if (response.IsSuccessStatusCode)
+                    return (true, "Cập nhật danh mục thành công!");
+                var err = await response.Content.ReadAsStringAsync();
+                return (false, err.Trim('"'));
+            }
+            catch (Exception ex) { return (false, $"Lỗi kết nối: {ex.Message}"); }
+        }
+
+        public async Task<(bool success, string message)> DeleteCategoryAsync(int id)
+        {
+            try
+            {
+                var response = await _httpClient.DeleteAsync($"api/categories/{id}");
+                if (response.IsSuccessStatusCode)
+                    return (true, "Xóa danh mục thành công!");
+                return (false, "Không thể xóa danh mục (có thể đang có sách thuộc danh mục này).");
+            }
+            catch (Exception ex) { return (false, $"Lỗi kết nối: {ex.Message}"); }
+        }
+
+        // =====================================================================
+        // AUTH
+        // =====================================================================
+
+        public async Task<(bool success, string message, UserSessionData? user)> LoginAsync(LoginViewModel model)
+        {
+            try
+            {
+                var payload = new { email = model.Email, password = model.Password };
+                var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
+                var response = await _httpClient.PostAsync("api/users/login", content);
+                if (response.IsSuccessStatusCode)
+                {
+                    var userData = await response.Content.ReadFromJsonAsync<UserSessionData>(_jsonOptions);
                     if (userData != null)
                         return (true, "Đăng nhập thành công!", userData);
                     return (false, "Lỗi xử lý dữ liệu.", null);
@@ -74,10 +210,7 @@ namespace BookStoreOnline.MVC.Services
                     return (false, errorMsg.Trim('"'), null);
                 }
             }
-            catch (Exception ex)
-            {
-                return (false, $"Không thể kết nối đến máy chủ: {ex.Message}", null);
-            }
+            catch (Exception ex) { return (false, $"Không thể kết nối đến máy chủ: {ex.Message}", null); }
         }
 
         public async Task<(bool success, string message)> RegisterAsync(RegisterViewModel model)
@@ -91,29 +224,14 @@ namespace BookStoreOnline.MVC.Services
                     passwordHash = model.Password,
                     role = "Customer"
                 };
-
-                var content = new StringContent(
-                    JsonSerializer.Serialize(payload),
-                    Encoding.UTF8,
-                    "application/json"
-                );
-
+                var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
                 var response = await _httpClient.PostAsync("api/users/register", content);
-
                 if (response.IsSuccessStatusCode)
-                {
                     return (true, "Đăng ký thành công! Vui lòng đăng nhập.");
-                }
-                else
-                {
-                    var errorMsg = await response.Content.ReadAsStringAsync();
-                    return (false, errorMsg.Trim('"'));
-                }
+                var errorMsg = await response.Content.ReadAsStringAsync();
+                return (false, errorMsg.Trim('"'));
             }
-            catch (Exception ex)
-            {
-                return (false, $"Không thể kết nối đến máy chủ: {ex.Message}");
-            }
+            catch (Exception ex) { return (false, $"Không thể kết nối đến máy chủ: {ex.Message}"); }
         }
     }
 }

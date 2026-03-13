@@ -1,0 +1,140 @@
+@model BookStoreOnline.MVC.Models.BookCreateViewModel
+@{
+    ViewData["Title"] = "Sửa Sách";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="page-header">
+    <div>
+        <div class="page-header-title">✏️ Chỉnh sửa Sách</div>
+        <div class="page-header-sub">Cập nhật thông tin sách</div>
+    </div>
+    <a asp-controller="Admin" asp-action="Books" class="btn-admin-secondary">
+        <i class="bi bi-arrow-left"></i> Quay lại
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="admin-card">
+            <form asp-controller="Admin" asp-action="BookEdit" asp-route-id="@Model.Id" method="post">
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly" class="admin-error mb-3"></div>
+
+                <div class="row g-3">
+                    <div class="col-12">
+                        <div class="admin-form-group">
+                            <label asp-for="Title" class="admin-label"></label>
+                            <input asp-for="Title" class="admin-input @(ViewData.ModelState["Title"]?.Errors.Any() == true ? "is-invalid" : "")"
+                                   placeholder="Nhập tiêu đề sách..." />
+                            <span asp-validation-for="Title" class="admin-error"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="admin-form-group">
+                            <label asp-for="Author" class="admin-label"></label>
+                            <input asp-for="Author" class="admin-input @(ViewData.ModelState["Author"]?.Errors.Any() == true ? "is-invalid" : "")"
+                                   placeholder="Tên tác giả..." />
+                            <span asp-validation-for="Author" class="admin-error"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="admin-form-group">
+                            <label asp-for="CategoryId" class="admin-label"></label>
+                            <select asp-for="CategoryId" class="admin-input @(ViewData.ModelState["CategoryId"]?.Errors.Any() == true ? "is-invalid" : "")">
+                                <option value="">-- Chọn danh mục --</option>
+                                @foreach (var cat in Model.Categories)
+                                {
+                                    <option value="@cat.Id">@cat.Name</option>
+                                }
+                            </select>
+                            <span asp-validation-for="CategoryId" class="admin-error"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="admin-form-group">
+                            <label asp-for="Price" class="admin-label"></label>
+                            <input asp-for="Price" type="number" class="admin-input @(ViewData.ModelState["Price"]?.Errors.Any() == true ? "is-invalid" : "")"
+                                   placeholder="0" min="0" />
+                            <span asp-validation-for="Price" class="admin-error"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="admin-form-group">
+                            <label asp-for="StockQuantity" class="admin-label"></label>
+                            <input asp-for="StockQuantity" type="number" class="admin-input" placeholder="0" min="0" />
+                            <span asp-validation-for="StockQuantity" class="admin-error"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="admin-form-group">
+                            <label asp-for="ImageUrl" class="admin-label"></label>
+                            <input asp-for="ImageUrl" class="admin-input"
+                                   placeholder="https://example.com/image.jpg"
+                                   oninput="previewImage(this.value)" />
+                            <span asp-validation-for="ImageUrl" class="admin-error"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="admin-form-group">
+                            <label asp-for="Description" class="admin-label"></label>
+                            <textarea asp-for="Description" class="admin-input @(ViewData.ModelState["Description"]?.Errors.Any() == true ? "is-invalid" : "")"
+                                      rows="4" placeholder="Mô tả nội dung sách..."></textarea>
+                            <span asp-validation-for="Description" class="admin-error"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-3 mt-4">
+                    <button type="submit" class="btn-admin-primary">
+                        <i class="bi bi-check-lg"></i> Cập nhật
+                    </button>
+                    <a asp-controller="Admin" asp-action="Books" class="btn-admin-secondary">Hủy</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Image Preview -->
+    <div class="col-md-4">
+        <div class="admin-card" style="text-align:center;">
+            <div class="admin-card-title" style="justify-content:center;">
+                <i class="bi bi-image" style="color:var(--primary-light);"></i> Xem trước bìa sách
+            </div>
+            <div id="imgPreview"
+                 style="width:120px;height:170px;background:var(--primary-glow);border-radius:10px;display:flex;align-items:center;justify-content:center;margin:0 auto;font-size:3rem;border:2px dashed rgba(99,102,241,0.3);">
+                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                {
+                    <img src="@Model.ImageUrl" style="width:120px;height:170px;object-fit:cover;border-radius:8px;"
+                         onerror="this.parentElement.innerHTML='📚'" />
+                }
+                else
+                {
+                    <text>📚</text>
+                }
+            </div>
+            <p style="font-size:0.78rem;color:var(--text-muted);margin-top:0.75rem;">Nhập URL hình ảnh để xem trước</p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        function previewImage(url) {
+            var preview = document.getElementById('imgPreview');
+            if (url && url.trim()) {
+                preview.innerHTML = '<img src="' + url + '" style="width:120px;height:170px;object-fit:cover;border-radius:8px;" onerror="this.parentElement.innerHTML=\'📚\'" />';
+            } else {
+                preview.innerHTML = '📚';
+            }
+        }
+    </script>
+}

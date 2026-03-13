@@ -1,0 +1,76 @@
+@model List<BookStoreOnline.MVC.Models.CategoryViewModel>
+@{
+    ViewData["Title"] = "Quản lý Danh mục";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="page-header">
+    <div>
+        <div class="page-header-title">🏷️ Quản lý Danh mục</div>
+        <div class="page-header-sub">Tổng cộng @Model.Count danh mục</div>
+    </div>
+    <a asp-controller="Admin" asp-action="CategoryCreate" class="btn-admin-primary">
+        <i class="bi bi-plus-lg"></i> Thêm danh mục
+    </a>
+</div>
+
+<div class="admin-card">
+    @if (!Model.Any())
+    {
+        <div style="text-align:center;padding:3rem;color:var(--text-muted);">
+            <i class="bi bi-tag" style="font-size:3rem;display:block;margin-bottom:1rem;opacity:0.3;"></i>
+            <p>Chưa có danh mục nào.</p>
+            <a asp-controller="Admin" asp-action="CategoryCreate" class="btn-admin-primary">
+                <i class="bi bi-plus-lg"></i> Tạo danh mục đầu tiên
+            </a>
+        </div>
+    }
+    else
+    {
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th style="width:60px;">#</th>
+                    <th>Tên danh mục</th>
+                    <th>Mô tả</th>
+                    <th style="width:120px;">Số sách</th>
+                    <th style="width:160px;">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.Count; i++)
+                {
+                    var cat = Model[i];
+                    <tr>
+                        <td style="color:var(--text-light);font-size:0.8rem;">@(i + 1)</td>
+                        <td>
+                            <div style="font-weight:600;">@cat.Name</div>
+                        </td>
+                        <td style="color:var(--text-muted);font-size:0.85rem;">
+                            @(string.IsNullOrEmpty(cat.Description) ? "—" : (cat.Description.Length > 80 ? cat.Description[..80] + "..." : cat.Description))
+                        </td>
+                        <td>
+                            <span class="badge-admin badge-primary">@cat.BookCount sách</span>
+                        </td>
+                        <td>
+                            <div class="d-flex gap-2">
+                                <a asp-controller="Admin" asp-action="CategoryEdit" asp-route-id="@cat.Id"
+                                   class="btn-admin-edit">
+                                    <i class="bi bi-pencil"></i> Sửa
+                                </a>
+                                <form id="delCat_@cat.Id" asp-controller="Admin" asp-action="CategoryDelete"
+                                      asp-route-id="@cat.Id" method="post" style="display:inline;">
+                                    @Html.AntiForgeryToken()
+                                    <button type="button" class="btn-admin-delete"
+                                            onclick="confirmDelete('delCat_@cat.Id', '@cat.Name')">
+                                        <i class="bi bi-trash3"></i> Xóa
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
