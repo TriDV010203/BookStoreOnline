@@ -1,7 +1,6 @@
 using BookStoreOnline.MVC.Models;
 using BookStoreOnline.MVC.Services;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.Json;
 
 namespace BookStoreOnline.MVC.Controllers
 {
@@ -18,7 +17,6 @@ namespace BookStoreOnline.MVC.Controllers
         [HttpGet]
         public IActionResult Login(string? returnUrl = null)
         {
-            // Nếu đã đăng nhập rồi thì về Home
             if (HttpContext.Session.GetString("UserEmail") != null)
                 return RedirectToAction("Index", "Home");
 
@@ -38,7 +36,6 @@ namespace BookStoreOnline.MVC.Controllers
 
             if (success && user != null)
             {
-                // Lưu thông tin vào session
                 HttpContext.Session.SetString("UserId", user.Id.ToString());
                 HttpContext.Session.SetString("UserFullName", user.FullName);
                 HttpContext.Session.SetString("UserEmail", user.Email);
@@ -90,6 +87,97 @@ namespace BookStoreOnline.MVC.Controllers
             HttpContext.Session.Clear();
             TempData["SuccessMessage"] = "Đăng xuất thành công!";
             return RedirectToAction("Index", "Home");
+        }
+
+        // ── PROFILE ──────────────────────────────────────────────────────────
+
+        // GET: /Account/Profile
+        [HttpGet]
+        public IActionResult Profile()
+        {
+            if (HttpContext.Session.GetString("UserEmail") == null)
+                return RedirectToAction("Login");
+
+            var model = new UpdateProfileViewModel
+            {
+                FullName = HttpContext.Session.GetString("UserFullName") ?? "",
+                Email = HttpContext.Session.GetString("UserEmail") ?? ""
+            };
+            return View(model);
+        }
+
+        // POST: /Account/Profile
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Profile(UpdateProfileViewModel model)
+        {
+            if (HttpContext.Session.GetString("UserEmail") == null)
+                return RedirectToAction("Login");
+
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var userIdStr = HttpContext.Session.GetString("UserId");
+            if (!int.TryParse(userIdStr, out int userId))
+            {
+                TempData["ErrorMessage"] = "Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.";
+                return RedirectToAction("Login");
+            }
+
+            var (success, message) = await _apiService.UpdateProfileAsync(userId, model);
+
+            if (success)
+            {
+                // Cập nhật lại session
+                HttpContext.Session.SetString("UserFullName", model.FullName);
+                HttpContext.Session.SetString("UserEmail", model.Email);
+                TempData["SuccessMessage"] = message;
+                return RedirectToAction("Profile");
+            }
+
+            ModelState.AddModelError(string.Empty, message);
+            return View(model);
+        }
+
+        // ── CHANGE PASSWORD ───────────────────────────────────────────────────
+
+        // GET: /Account/ChangePassword
+        [HttpGet]
+        public IActionResult ChangePassword()
+        {
+            if (HttpContext.Session.GetString("UserEmail") == null)
+                return RedirectToAction("Login");
+            return View();
+        }
+
+        // POST: /Account/ChangePassword
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+        {
+            if (HttpContext.Session.GetString("UserEmail") == null)
+                return RedirectToAction("Login");
+
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var userIdStr = HttpContext.Session.GetString("UserId");
+            if (!int.TryParse(userIdStr, out int userId))
+            {
+                TempData["ErrorMessage"] = "Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.";
+                return RedirectToAction("Login");
+            }
+
+            var (success, message) = await _apiService.ChangePasswordAsync(userId, model);
+
+            if (success)
+            {
+                TempData["SuccessMessage"] = message;
+                return RedirectToAction("Profile");
+            }
+
+            ModelState.AddModelError(string.Empty, message);
+            return View(model);
         }
     }
 }

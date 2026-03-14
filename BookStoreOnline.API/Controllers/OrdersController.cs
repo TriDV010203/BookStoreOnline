@@ -1,4 +1,4 @@
-﻿using BookStoreOnline.API.Models;
+using BookStoreOnline.API.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,17 +20,29 @@ namespace BookStoreOnline.API.Controllers
         public async Task<ActionResult<IEnumerable<Order>>> GetOrders()
         {
             return await _context.Orders
-                .Include(o => o.OrderDetails) // Lấy danh sách chi tiết
-                .ThenInclude(od => od.Book)   // Lấy luôn thông tin cuốn sách trong chi tiết đó
+                .Include(o => o.OrderDetails)
+                .ThenInclude(od => od.Book)
                 .ToListAsync();
         }
 
-        // 2. Xem chi tiết 1 đơn hàng cụ thể
+        // 2. Lấy đơn hàng của 1 user
+        [HttpGet("user/{userId}")]
+        public async Task<ActionResult<IEnumerable<Order>>> GetOrdersByUser(int userId)
+        {
+            return await _context.Orders
+                .Where(o => o.UserId == userId)
+                .Include(o => o.OrderDetails)
+                .ThenInclude(od => od.Book)
+                .OrderByDescending(o => o.OrderDate)
+                .ToListAsync();
+        }
+
+        // 3. Xem chi tiết 1 đơn hàng cụ thể
         [HttpGet("{id}")]
         public async Task<ActionResult<Order>> GetOrder(int id)
         {
             var order = await _context.Orders
-                .Include(o => o.User)         // Kèm thông tin người mua
+                .Include(o => o.User)
                 .Include(o => o.OrderDetails)
                 .ThenInclude(od => od.Book)
                 .FirstOrDefaultAsync(o => o.Id == id);
@@ -40,17 +52,28 @@ namespace BookStoreOnline.API.Controllers
             return order;
         }
 
-        // 3. Đặt hàng (Checkout)
+        // 4. Đặt hàng (Checkout) — trừ StockQuantity của sách
         [HttpPost]
         public async Task<ActionResult<Order>> PostOrder(Order order)
         {
             // Tránh EF Core tự động tạo lại User và Book mới
             order.User = null;
+
             if (order.OrderDetails != null)
             {
                 foreach (var detail in order.OrderDetails)
                 {
                     detail.Book = null;
+
+                    // Trừ số lượng tồn kho
+                    var book = await _context.Books.FindAsync(detail.BookId);
+                    if (book == null)
+                        return BadRequest($"Không tìm thấy sách ID {detail.BookId}.");
+
+                    if (book.StockQuantity < detail.Quantity)
+                        return BadRequest($"Sách \"{book.Title}\" không đủ số lượng trong kho (còn {book.StockQuantity}).");
+
+                    book.StockQuantity -= detail.Quantity;
                 }
             }
 

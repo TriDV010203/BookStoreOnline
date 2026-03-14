@@ -233,5 +233,70 @@ namespace BookStoreOnline.MVC.Services
             }
             catch (Exception ex) { return (false, $"Không thể kết nối đến máy chủ: {ex.Message}"); }
         }
+
+        // =====================================================================
+        // USER PROFILE
+        // =====================================================================
+
+        public async Task<(bool success, string message)> UpdateProfileAsync(int id, UpdateProfileViewModel model)
+        {
+            try
+            {
+                var payload = new { fullName = model.FullName, email = model.Email };
+                var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
+                var response = await _httpClient.PutAsync($"api/users/{id}", content);
+                if (response.IsSuccessStatusCode)
+                    return (true, "Cập nhật thông tin thành công!");
+                var err = await response.Content.ReadAsStringAsync();
+                return (false, err.Trim('"'));
+            }
+            catch (Exception ex) { return (false, $"Lỗi kết nối: {ex.Message}"); }
+        }
+
+        public async Task<(bool success, string message)> ChangePasswordAsync(int id, ChangePasswordViewModel model)
+        {
+            try
+            {
+                var payload = new { currentPassword = model.CurrentPassword, newPassword = model.NewPassword };
+                var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
+                var response = await _httpClient.PostAsync($"api/users/{id}/change-password", content);
+                if (response.IsSuccessStatusCode)
+                    return (true, "Đổi mật khẩu thành công!");
+                var err = await response.Content.ReadAsStringAsync();
+                return (false, err.Trim('"'));
+            }
+            catch (Exception ex) { return (false, $"Lỗi kết nối: {ex.Message}"); }
+        }
+
+        // =====================================================================
+        // ORDERS
+        // =====================================================================
+
+        public async Task<(bool success, string message)> PlaceOrderAsync(int userId, string shippingAddress, List<CartItemViewModel> items)
+        {
+            try
+            {
+                var payload = new
+                {
+                    userId,
+                    totalAmount = items.Sum(i => i.SubTotal),
+                    shippingAddress,
+                    orderStatus = "Pending",
+                    orderDetails = items.Select(i => new
+                    {
+                        bookId = i.BookId,
+                        quantity = i.Quantity,
+                        unitPrice = i.UnitPrice
+                    }).ToList()
+                };
+                var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
+                var response = await _httpClient.PostAsync("api/orders", content);
+                if (response.IsSuccessStatusCode)
+                    return (true, "Đặt hàng thành công! Cảm ơn bạn đã mua hàng.");
+                var err = await response.Content.ReadAsStringAsync();
+                return (false, err.Trim('"'));
+            }
+            catch (Exception ex) { return (false, $"Lỗi kết nối: {ex.Message}"); }
+        }
     }
 }

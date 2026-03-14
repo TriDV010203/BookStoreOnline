@@ -1,4 +1,4 @@
-﻿using BookStoreOnline.API.Models;
+using BookStoreOnline.API.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,11 +22,19 @@ namespace BookStoreOnline.API.Controllers
             return await _context.Users.ToListAsync();
         }
 
-        // 2. Đăng ký tài khoản mới
+        // 2. Lấy thông tin 1 user theo ID
+        [HttpGet("{id}")]
+        public async Task<ActionResult<User>> GetUser(int id)
+        {
+            var user = await _context.Users.FindAsync(id);
+            if (user == null) return NotFound("Không tìm thấy người dùng.");
+            return user;
+        }
+
+        // 3. Đăng ký tài khoản mới
         [HttpPost("register")]
         public async Task<ActionResult<User>> Register(User user)
         {
-            // Kiểm tra email đã tồn tại chưa
             if (await _context.Users.AnyAsync(u => u.Email == user.Email))
             {
                 return BadRequest("Email này đã được sử dụng!");
@@ -35,10 +43,10 @@ namespace BookStoreOnline.API.Controllers
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetUsers", new { id = user.Id }, user);
+            return CreatedAtAction("GetUser", new { id = user.Id }, user);
         }
 
-        // 3. Đăng nhập (Tạm thời check trực tiếp, Phase sau sẽ nâng cấp lên JWT Token)
+        // 4. Đăng nhập
         [HttpPost("login")]
         public async Task<ActionResult<User>> Login([FromBody] LoginRequest request)
         {
@@ -52,12 +60,62 @@ namespace BookStoreOnline.API.Controllers
 
             return Ok(user);
         }
+
+        // 5. Cập nhật thông tin người dùng (FullName, Email)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateUser(int id, [FromBody] UpdateUserRequest request)
+        {
+            var user = await _context.Users.FindAsync(id);
+            if (user == null) return NotFound("Không tìm thấy người dùng.");
+
+            // Kiểm tra email mới có bị trùng không (trừ chính user này)
+            if (user.Email != request.Email &&
+                await _context.Users.AnyAsync(u => u.Email == request.Email && u.Id != id))
+            {
+                return BadRequest("Email này đã được sử dụng bởi tài khoản khác!");
+            }
+
+            user.FullName = request.FullName;
+            user.Email = request.Email;
+
+            await _context.SaveChangesAsync();
+            return Ok(user);
+        }
+
+        // 6. Đổi mật khẩu
+        [HttpPost("{id}/change-password")]
+        public async Task<IActionResult> ChangePassword(int id, [FromBody] ChangePasswordRequest request)
+        {
+            var user = await _context.Users.FindAsync(id);
+            if (user == null) return NotFound("Không tìm thấy người dùng.");
+
+            if (user.PasswordHash != request.CurrentPassword)
+            {
+                return BadRequest("Mật khẩu hiện tại không đúng!");
+            }
+
+            user.PasswordHash = request.NewPassword;
+            await _context.SaveChangesAsync();
+
+            return Ok("Đổi mật khẩu thành công!");
+        }
     }
 
-    // Class phụ để hứng dữ liệu lúc đăng nhập
     public class LoginRequest
     {
-        public string Email { get; set; }
-        public string Password { get; set; }
+        public string Email { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+    }
+
+    public class UpdateUserRequest
+    {
+        public string FullName { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+    }
+
+    public class ChangePasswordRequest
+    {
+        public string CurrentPassword { get; set; } = string.Empty;
+        public string NewPassword { get; set; } = string.Empty;
     }
 }
