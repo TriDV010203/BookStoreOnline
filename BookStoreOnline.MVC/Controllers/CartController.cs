@@ -39,7 +39,7 @@ namespace BookStoreOnline.MVC.Controllers
 
         // ── POST /Cart/Add ────────────────────────────────────────────────────
         [HttpPost]
-        public async Task<IActionResult> Add(int bookId, int quantity = 1)
+        public async Task<IActionResult> Add(int bookId, int quantity = 1, string? returnUrl = null)
         {
             var book = await _apiService.GetBookByIdAsync(bookId);
             if (book == null)
@@ -78,6 +78,10 @@ namespace BookStoreOnline.MVC.Controllers
 
             SaveCartToSession(cart);
             TempData["SuccessMessage"] = $"Đã thêm \"{book.Title}\" vào giỏ hàng!";
+
+            if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+                return Redirect(returnUrl);
+
             return RedirectToAction("Index", "Home");
         }
 

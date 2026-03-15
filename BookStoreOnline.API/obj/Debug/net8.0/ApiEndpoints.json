@@ -291,6 +291,27 @@
   },
   {
     "ContainingType": "BookStoreOnline.API.Controllers.OrdersController",
+    "Method": "UpdateOrderStatus",
+    "RelativePath": "api/Orders/{id}/status",
+    "HttpMethod": "PATCH",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "request",
+        "Type": "BookStoreOnline.API.Controllers.UpdateOrderStatusRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BookStoreOnline.API.Controllers.OrdersController",
     "Method": "GetOrdersByUser",
     "RelativePath": "api/Orders/user/{userId}",
     "HttpMethod": "GET",
@@ -384,6 +405,22 @@
   },
   {
     "ContainingType": "BookStoreOnline.API.Controllers.UsersController",
+    "Method": "BanUser",
+    "RelativePath": "api/Users/{id}/ban",
+    "HttpMethod": "PATCH",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BookStoreOnline.API.Controllers.UsersController",
     "Method": "ChangePassword",
     "RelativePath": "api/Users/{id}/change-password",
     "HttpMethod": "POST",
@@ -398,6 +435,22 @@
       {
         "Name": "request",
         "Type": "BookStoreOnline.API.Controllers.ChangePasswordRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BookStoreOnline.API.Controllers.UsersController",
+    "Method": "UnbanUser",
+    "RelativePath": "api/Users/{id}/unban",
+    "HttpMethod": "PATCH",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
         "IsRequired": true
       }
     ],

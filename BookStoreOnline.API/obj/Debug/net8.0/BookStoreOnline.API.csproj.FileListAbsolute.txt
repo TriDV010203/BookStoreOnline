@@ -132,10 +132,10 @@ B:\Project cá nhân\BookStoreOnline\BookStoreOnline.API\obj\Debug\net8.0\static
 B:\Project cá nhân\BookStoreOnline\BookStoreOnline.API\obj\Debug\net8.0\staticwebassets\msbuild.buildMultiTargeting.BookStoreOnline.API.props
 B:\Project cá nhân\BookStoreOnline\BookStoreOnline.API\obj\Debug\net8.0\staticwebassets\msbuild.buildTransitive.BookStoreOnline.API.props
 B:\Project cá nhân\BookStoreOnline\BookStoreOnline.API\obj\Debug\net8.0\staticwebassets.pack.json
-B:\Project cá nhân\BookStoreOnline\BookStoreOnline.API\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
 B:\Project cá nhân\BookStoreOnline\BookStoreOnline.API\obj\Debug\net8.0\BookStor.E8CF6F9B.Up2Date
 B:\Project cá nhân\BookStoreOnline\BookStoreOnline.API\obj\Debug\net8.0\BookStoreOnline.API.dll
 B:\Project cá nhân\BookStoreOnline\BookStoreOnline.API\obj\Debug\net8.0\refint\BookStoreOnline.API.dll
 B:\Project cá nhân\BookStoreOnline\BookStoreOnline.API\obj\Debug\net8.0\BookStoreOnline.API.pdb
 B:\Project cá nhân\BookStoreOnline\BookStoreOnline.API\obj\Debug\net8.0\BookStoreOnline.API.genruntimeconfig.cache
 B:\Project cá nhân\BookStoreOnline\BookStoreOnline.API\obj\Debug\net8.0\ref\BookStoreOnline.API.dll
+B:\Project cá nhân\BookStoreOnline\BookStoreOnline.API\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

@@ -1,0 +1,244 @@
+@model List<BookStoreOnline.MVC.Models.OrderViewModel>
+@{
+    ViewData["Title"] = "Đơn hàng của tôi";
+}
+
+@section Styles {
+<style>
+    .orders-page { padding: 3rem 0 5rem; }
+
+    .page-header-orders {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+    }
+
+    .page-header-orders h1 {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: var(--text-light);
+        margin: 0;
+    }
+
+    .order-card {
+        background: var(--dark-card);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-bottom: 1.25rem;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .order-card:hover {
+        border-color: rgba(201,168,76,0.4);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+    }
+
+    .order-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .order-id {
+        font-weight: 700;
+        color: var(--text-light);
+        font-size: 1rem;
+    }
+
+    .order-date {
+        font-size: 0.82rem;
+        color: var(--text-muted);
+        margin-top: 0.2rem;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.3rem 0.85rem;
+        border-radius: 20px;
+        font-size: 0.78rem;
+        font-weight: 600;
+    }
+
+    .status-pending   { background: rgba(251,191,36,0.15); color: #fbbf24; border: 1px solid rgba(251,191,36,0.3); }
+    .status-processing { background: rgba(99,102,241,0.15); color: #818cf8; border: 1px solid rgba(99,102,241,0.3); }
+    .status-shipped   { background: rgba(6,182,212,0.15); color: #22d3ee; border: 1px solid rgba(6,182,212,0.3); }
+    .status-delivered { background: rgba(74,222,128,0.15); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
+    .status-cancelled { background: rgba(248,113,113,0.15); color: #f87171; border: 1px solid rgba(248,113,113,0.3); }
+
+    .order-books {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.6rem;
+        margin-bottom: 1rem;
+    }
+
+    .order-book-thumb {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(255,255,255,0.04);
+        border-radius: 8px;
+        padding: 0.4rem 0.65rem;
+        font-size: 0.82rem;
+        color: var(--text-muted);
+    }
+
+    .order-book-thumb img {
+        width: 28px;
+        height: 38px;
+        object-fit: cover;
+        border-radius: 4px;
+    }
+
+    .order-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .order-total {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--primary);
+    }
+
+    .btn-view-detail {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        background: rgba(201,168,76,0.12);
+        color: var(--primary);
+        border: 1px solid rgba(201,168,76,0.3);
+        border-radius: 8px;
+        padding: 0.45rem 1rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+    .btn-view-detail:hover {
+        background: var(--primary);
+        color: #0a0a0f;
+        border-color: var(--primary);
+    }
+
+    .empty-orders {
+        text-align: center;
+        padding: 4rem 1rem;
+        color: var(--text-muted);
+    }
+
+    .empty-orders .empty-icon { font-size: 4rem; margin-bottom: 1rem; }
+    .empty-orders h4 { color: var(--text-light); margin-bottom: 0.5rem; }
+</style>
+}
+
+<section class="orders-page">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-9">
+                <div class="page-header-orders">
+                    <div>
+                        <h1><i class="bi bi-bag-check me-2"></i>Đơn hàng của tôi</h1>
+                        <p style="color: var(--text-muted); font-size: 0.88rem; margin: 0.25rem 0 0;">
+                            @Model.Count đơn hàng
+                        </p>
+                    </div>
+                    <a asp-controller="Account" asp-action="Profile" class="btn-view-detail">
+                        <i class="bi bi-arrow-left"></i> Quay lại hồ sơ
+                    </a>
+                </div>
+
+                @if (Model == null || Model.Count == 0)
+                {
+                    <div class="empty-orders">
+                        <div class="empty-icon">📦</div>
+                        <h4>Chưa có đơn hàng nào</h4>
+                        <p>Hãy khám phá và đặt mua sách ngay!</p>
+                        <a asp-controller="Home" asp-action="Index" class="btn-auth-submit" style="display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; width: auto; padding: 0.75rem 2rem; margin-top: 1rem;">
+                            <i class="bi bi-shop"></i> Mua sắm ngay
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    foreach (var order in Model)
+                    {
+                        <div class="order-card">
+                            <div class="order-header">
+                                <div>
+                                    <div class="order-id">Đơn hàng #@order.Id</div>
+                                    <div class="order-date">
+                                        <i class="bi bi-calendar3 me-1"></i>@order.OrderDate.ToString("dd/MM/yyyy HH:mm")
+                                    </div>
+                                </div>
+                                @{
+                                    var statusClass = order.OrderStatus switch
+                                    {
+                                        "Pending"    => "status-pending",
+                                        "Processing" => "status-processing",
+                                        "Shipped"    => "status-shipped",
+                                        "Delivered"  => "status-delivered",
+                                        "Cancelled"  => "status-cancelled",
+                                        _            => "status-pending"
+                                    };
+                                    var statusText = order.OrderStatus switch
+                                    {
+                                        "Pending"    => "⏳ Chờ xác nhận",
+                                        "Processing" => "📦 Đang chuẩn bị",
+                                        "Shipped"    => "🚚 Đang giao",
+                                        "Delivered"  => "✅ Đã giao",
+                                        "Cancelled"  => "❌ Đã hủy",
+                                        _            => order.OrderStatus
+                                    };
+                                }
+                                <span class="status-badge @statusClass">@statusText</span>
+                            </div>
+
+                            <div class="order-books">
+                                @foreach (var item in order.OrderDetails.Take(4))
+                                {
+                                    <div class="order-book-thumb">
+                                        @if (!string.IsNullOrEmpty(item.BookImageUrl))
+                                        {
+                                            <img src="@item.BookImageUrl" alt="@item.BookTitle" onerror="this.style.display='none'" />
+                                        }
+                                        <span>@item.BookTitle <span style="color: var(--primary);">×@item.Quantity</span></span>
+                                    </div>
+                                }
+                                @if (order.OrderDetails.Count > 4)
+                                {
+                                    <div class="order-book-thumb" style="color: var(--primary);">+@(order.OrderDetails.Count - 4) sản phẩm</div>
+                                }
+                            </div>
+
+                            <div class="order-footer">
+                                <div>
+                                    <span style="color: var(--text-muted); font-size: 0.85rem;">Tổng cộng: </span>
+                                    <span class="order-total">@order.TotalAmount.ToString("N0")₫</span>
+                                </div>
+                                <a asp-controller="Account" asp-action="OrderDetail" asp-route-id="@order.Id"
+                                   class="btn-view-detail">
+                                    <i class="bi bi-eye"></i> Xem chi tiết
+                                </a>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</section>

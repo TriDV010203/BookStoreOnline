@@ -28,5 +28,14 @@ namespace BookStoreOnline.MVC.Services
 
         // ===== ORDERS =====
         Task<(bool success, string message)> PlaceOrderAsync(int userId, string shippingAddress, List<CartItemViewModel> items);
+        Task<List<OrderViewModel>> GetOrdersByUserAsync(int userId);
+        Task<List<OrderViewModel>> GetAllOrdersAsync();
+        Task<OrderViewModel?> GetOrderDetailAsync(int orderId);
+        Task<(bool success, string message)> UpdateOrderStatusAsync(int orderId, string status);
+
+        // ===== USERS (ADMIN) =====
+        Task<List<UserAdminViewModel>> GetAllUsersAsync();
+        Task<(bool success, string message)> BanUserAsync(int userId);
+        Task<(bool success, string message)> UnbanUserAsync(int userId);
     }
 }

@@ -1,0 +1,379 @@
+@model BookStoreOnline.MVC.Models.CartViewModel
+@{
+    ViewData["Title"] = "Giỏ hàng";
+}
+
+@section Styles {
+<style>
+    .cart-page { padding: 3rem 0 5rem; }
+
+    .cart-page-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.9rem;
+        font-weight: 700;
+        color: var(--text-light);
+        margin-bottom: 0.25rem;
+    }
+
+    .cart-subtitle {
+        color: var(--text-muted);
+        font-size: 0.88rem;
+        margin-bottom: 2rem;
+    }
+
+    /* Cart Table */
+    .cart-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 0.6rem;
+    }
+
+    .cart-table thead th {
+        font-size: 0.78rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        color: var(--text-muted);
+        padding: 0 1rem 0.5rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .cart-row {
+        background: var(--surface, var(--dark-card));
+        border-radius: 14px;
+        transition: box-shadow 0.2s;
+    }
+
+    .cart-row:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
+
+    .cart-row td {
+        padding: 1rem;
+        vertical-align: middle;
+    }
+
+    .cart-row td:first-child { border-radius: 14px 0 0 14px; }
+    .cart-row td:last-child  { border-radius: 0 14px 14px 0; }
+
+    /* Book cover in cart */
+    .cart-book-img {
+        width: 56px;
+        height: 72px;
+        object-fit: cover;
+        border-radius: 6px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+
+    .cart-book-placeholder {
+        width: 56px;
+        height: 72px;
+        background: var(--dark-card2, #16153a);
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+    }
+
+    .cart-book-title {
+        font-weight: 700;
+        color: var(--text-light);
+        font-size: 0.92rem;
+        margin-bottom: 0.2rem;
+    }
+
+    .cart-book-author {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+    }
+
+    .cart-price {
+        font-weight: 700;
+        color: var(--primary);
+        font-size: 0.95rem;
+        white-space: nowrap;
+    }
+
+    /* Qty control */
+    .qty-ctrl {
+        display: flex;
+        align-items: center;
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        overflow: hidden;
+        background: var(--dark-bg);
+        width: fit-content;
+    }
+
+    .qty-ctrl-btn {
+        background: transparent;
+        border: none;
+        color: var(--text-muted);
+        width: 32px;
+        height: 32px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.15s, color 0.15s;
+    }
+
+    .qty-ctrl-btn:hover { background: rgba(201,168,76,0.12); color: var(--primary); }
+
+    .qty-ctrl-val {
+        width: 36px;
+        text-align: center;
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: var(--text-light);
+        background: transparent;
+        border: none;
+        outline: none;
+    }
+
+    /* Subtotal */
+    .cart-subtotal {
+        font-weight: 800;
+        color: var(--primary);
+        font-size: 1rem;
+        white-space: nowrap;
+    }
+
+    /* Remove btn */
+    .btn-cart-remove {
+        background: transparent;
+        border: 1px solid rgba(248,113,113,0.3);
+        color: #f87171;
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+    }
+
+    .btn-cart-remove:hover {
+        background: rgba(248,113,113,0.12);
+        border-color: #f87171;
+    }
+
+    /* Summary box */
+    .cart-summary {
+        background: var(--dark-card);
+        border: 1px solid var(--border-color);
+        border-radius: 18px;
+        padding: 1.75rem;
+        position: sticky;
+        top: 1.5rem;
+    }
+
+    .cart-summary-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text-light);
+        margin-bottom: 1.2rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .cart-summary-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.88rem;
+        color: var(--text-muted);
+        margin-bottom: 0.6rem;
+    }
+
+    .cart-summary-total {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 0.75rem;
+        margin-top: 0.5rem;
+        border-top: 1px solid var(--border-color);
+        font-weight: 800;
+        font-size: 1.1rem;
+        color: var(--text-light);
+    }
+
+    .cart-summary-total span:last-child { color: var(--primary); }
+
+    .btn-checkout {
+        display: block;
+        width: 100%;
+        margin-top: 1.25rem;
+        background: linear-gradient(135deg, var(--primary), #8a6e2f);
+        color: var(--dark-bg);
+        border: none;
+        padding: 0.85rem;
+        border-radius: 14px;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        text-align: center;
+        text-decoration: none;
+        transition: all 0.25s;
+        letter-spacing: 0.3px;
+    }
+
+    .btn-checkout:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(201,168,76,0.35);
+        color: var(--dark-bg);
+    }
+
+    .btn-continue {
+        display: block;
+        text-align: center;
+        margin-top: 0.75rem;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+
+    .btn-continue:hover { color: var(--primary); }
+
+    /* Empty cart */
+    .cart-empty {
+        text-align: center;
+        padding: 5rem 1rem;
+    }
+
+    .cart-empty .empty-icon { font-size: 5rem; opacity: 0.35; }
+</style>
+}
+
+<section class="cart-page">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="cart-page-title"><i class="bi bi-cart3 me-2"></i>Giỏ hàng của bạn</h1>
+                <p class="cart-subtitle">@Model.TotalItems sản phẩm trong giỏ</p>
+            </div>
+        </div>
+
+        @if (!Model.Items.Any())
+        {
+            <div class="cart-empty">
+                <div class="empty-icon">🛒</div>
+                <h4 style="color: var(--text-muted); margin: 1rem 0 0.5rem;">Giỏ hàng trống</h4>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">
+                    Hãy thêm sách yêu thích vào giỏ hàng để tiến hành mua.
+                </p>
+                <a asp-controller="Home" asp-action="Index" class="btn-checkout" style="display: inline-block; width: auto; padding: 0.75rem 2rem;">
+                    <i class="bi bi-book me-2"></i>Khám phá sách
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="row g-4">
+                <!-- Cart Items -->
+                <div class="col-12 col-lg-8">
+                    <table class="cart-table">
+                        <thead>
+                            <tr>
+                                <th>Sản phẩm</th>
+                                <th>Đơn giá</th>
+                                <th>Số lượng</th>
+                                <th>Thành tiền</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Items)
+                            {
+                                <tr class="cart-row">
+                                    <td>
+                                        <div class="d-flex align-items-center gap-3">
+                                            @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                            {
+                                                <img src="@item.ImageUrl" alt="@item.Title" class="cart-book-img" />
+                                            }
+                                            else
+                                            {
+                                                <div class="cart-book-placeholder">📖</div>
+                                            }
+                                            <div>
+                                                <div class="cart-book-title">@item.Title</div>
+                                                <div class="cart-book-author">bởi @item.Author</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="cart-price">@item.UnitPrice.ToString("N0")₫</td>
+                                    <td>
+                                        <form method="post" asp-controller="Cart" asp-action="UpdateQuantity" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="bookId" value="@item.BookId" />
+                                            <div class="qty-ctrl">
+                                                <button type="submit" name="quantity" value="@(item.Quantity - 1)"
+                                                        class="qty-ctrl-btn" title="Giảm">
+                                                    <i class="bi bi-dash"></i>
+                                                </button>
+                                                <span class="qty-ctrl-val">@item.Quantity</span>
+                                                <button type="submit" name="quantity" value="@(item.Quantity + 1)"
+                                                        class="qty-ctrl-btn @(item.Quantity >= item.StockQuantity ? "disabled" : "")"
+                                                        title="Tăng"
+                                                        @(item.Quantity >= item.StockQuantity ? "disabled" : "")>
+                                                    <i class="bi bi-plus"></i>
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </td>
+                                    <td class="cart-subtotal">@item.SubTotal.ToString("N0")₫</td>
+                                    <td>
+                                        <form method="post" asp-controller="Cart" asp-action="Remove">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="bookId" value="@item.BookId" />
+                                            <button type="submit" class="btn-cart-remove" title="Xóa">
+                                                <i class="bi bi-trash3"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+
+                    <a asp-controller="Home" asp-action="Index" class="btn-continue">
+                        <i class="bi bi-arrow-left me-1"></i> Tiếp tục mua sắm
+                    </a>
+                </div>
+
+                <!-- Order Summary -->
+                <div class="col-12 col-lg-4">
+                    <div class="cart-summary">
+                        <div class="cart-summary-title">
+                            <i class="bi bi-receipt me-2"></i>Tóm tắt đơn hàng
+                        </div>
+                        <div class="cart-summary-row">
+                            <span>Số lượng sản phẩm</span>
+                            <span>@Model.TotalItems cuốn</span>
+                        </div>
+                        <div class="cart-summary-row">
+                            <span>Phí vận chuyển</span>
+                            <span style="color: #4ade80;">Miễn phí</span>
+                        </div>
+                        <div class="cart-summary-total">
+                            <span>Tổng cộng</span>
+                            <span>@Model.TotalAmount.ToString("N0")₫</span>
+                        </div>
+
+                        <a asp-controller="Cart" asp-action="Checkout" class="btn-checkout">
+                            <i class="bi bi-bag-check me-2"></i>Tiến hành đặt hàng
+                        </a>
+                        <a asp-controller="Home" asp-action="Index" class="btn-continue">
+                            <i class="bi bi-arrow-left me-1"></i> Tiếp tục mua sắm
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</section>

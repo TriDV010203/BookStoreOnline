@@ -1,0 +1,229 @@
+@model BookStoreOnline.MVC.Models.UpdateProfileViewModel
+@{
+    ViewData["Title"] = "Hồ sơ cá nhân";
+    var userRole = Context.Session.GetString("UserRole") ?? "";
+    var userAvatar = Context.Session.GetString("UserFullName")?[0].ToString().ToUpper() ?? "U";
+}
+
+@section Styles {
+<style>
+    .profile-page { padding: 3rem 0 5rem; }
+
+    .profile-header {
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+        margin-bottom: 2.5rem;
+        padding: 1.75rem;
+        background: var(--dark-card);
+        border-radius: 18px;
+        border: 1px solid var(--border-color);
+    }
+
+    .profile-avatar-lg {
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary), #6d28d9);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #fff;
+        flex-shrink: 0;
+        box-shadow: 0 4px 16px rgba(139,92,246,0.35);
+    }
+
+    .profile-header-info h2 {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: var(--text-light);
+        margin: 0 0 0.25rem;
+    }
+
+    .profile-role-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        background: rgba(201,168,76,0.12);
+        color: var(--primary);
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        border: 1px solid rgba(201,168,76,0.25);
+    }
+
+    .profile-card {
+        background: var(--dark-card);
+        border: 1px solid var(--border-color);
+        border-radius: 18px;
+        padding: 1.75rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .profile-card-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--text-light);
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .profile-card-title i { color: var(--primary); }
+</style>
+}
+
+<section class="profile-page">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-8">
+
+                <!-- Profile Header -->
+                <div class="profile-header">
+                    <div class="profile-avatar-lg">@userAvatar</div>
+                    <div class="profile-header-info">
+                        <h2>@Context.Session.GetString("UserFullName")</h2>
+                        <span class="profile-role-badge">
+                            <i class="bi bi-person-badge"></i>
+                            @userRole
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Update Info -->
+                <div class="profile-card">
+                    <div class="profile-card-title">
+                        <i class="bi bi-person-lines-fill"></i> Thông tin cá nhân
+                    </div>
+
+                    <form method="post" asp-controller="Account" asp-action="Profile">
+                        @Html.AntiForgeryToken()
+
+                        <div class="form-group-book">
+                            <label class="form-label-book" asp-for="FullName">
+                                <i class="bi bi-person me-1"></i>Họ và tên
+                            </label>
+                            <input asp-for="FullName" class="form-control-book" placeholder="Nhập họ và tên..." />
+                            <span asp-validation-for="FullName" class="field-error"></span>
+                        </div>
+
+                        <div class="form-group-book">
+                            <label class="form-label-book" asp-for="Email">
+                                <i class="bi bi-envelope me-1"></i>Email
+                            </label>
+                            <input asp-for="Email" type="email" class="form-control-book" placeholder="Nhập email..." />
+                            <span asp-validation-for="Email" class="field-error"></span>
+                        </div>
+
+                        <div asp-validation-summary="ModelOnly" class="alert-book alert-danger-book mb-3"
+                             style="display: none;"></div>
+
+                        <button type="submit" class="btn-auth-submit">
+                            <i class="bi bi-check2 me-2"></i>Lưu thay đổi
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Change Password -->
+                <div class="profile-card">
+                    <div class="profile-card-title">
+                        <i class="bi bi-shield-lock"></i> Đổi mật khẩu
+                    </div>
+
+                    <form method="post" asp-controller="Account" asp-action="ChangePassword">
+                        @Html.AntiForgeryToken()
+
+                        <div class="form-group-book">
+                            <label class="form-label-book">
+                                <i class="bi bi-lock me-1"></i>Mật khẩu hiện tại
+                            </label>
+                            <input type="password" name="CurrentPassword" class="form-control-book"
+                                   placeholder="Nhập mật khẩu hiện tại..." />
+                        </div>
+
+                        <div class="form-group-book">
+                            <label class="form-label-book">
+                                <i class="bi bi-lock me-1"></i>Mật khẩu mới
+                            </label>
+                            <input type="password" name="NewPassword" class="form-control-book"
+                                   placeholder="Nhập mật khẩu mới (ít nhất 6 ký tự)..." />
+                        </div>
+
+                        <div class="form-group-book">
+                            <label class="form-label-book">
+                                <i class="bi bi-lock-fill me-1"></i>Xác nhận mật khẩu mới
+                            </label>
+                            <input type="password" name="ConfirmPassword" class="form-control-book"
+                                   placeholder="Nhập lại mật khẩu mới..." />
+                        </div>
+
+                        <button type="submit" class="btn-auth-submit" style="background: linear-gradient(135deg, #6d28d9, #4c1d95);">
+                            <i class="bi bi-shield-check me-2"></i>Đổi mật khẩu
+                        </button>
+                    </form>
+                </div>
+
+                @if (userRole != "Admin")
+                {
+                <!-- My Orders Link -->
+                <div class="profile-card">
+                    <div class="profile-card-title">
+                        <i class="bi bi-bag-check"></i> Đơn hàng của tôi
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1rem;">
+                        Xem lịch sử các đơn hàng bạn đã đặt mua.
+                    </p>
+                    <a asp-controller="Account" asp-action="MyOrders"
+                       class="btn-auth-submit"
+                       style="display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; width: auto; padding: 0.7rem 1.75rem;">
+                        <i class="bi bi-list-ul"></i> Xem lịch sử đơn hàng
+                    </a>
+                </div>
+                }
+
+                <!-- Quick Links -->
+                <div class="d-flex gap-3 flex-wrap">
+                    @if (userRole != "Admin")
+                    {
+                    <a asp-controller="Account" asp-action="MyOrders"
+                       style="color: var(--text-muted); font-size: 0.88rem; text-decoration: none; display: flex; align-items: center; gap: 0.4rem; transition: color 0.2s;"
+                       onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-muted)'">
+                        <i class="bi bi-bag-check"></i> Đơn hàng của tôi
+                    </a>
+                    }
+                    <a asp-controller="Cart" asp-action="Index"
+                       style="color: var(--text-muted); font-size: 0.88rem; text-decoration: none; display: flex; align-items: center; gap: 0.4rem; transition: color 0.2s;"
+                       onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-muted)'">
+                        <i class="bi bi-cart3"></i> Giỏ hàng của tôi
+                    </a>
+                    <a asp-controller="Home" asp-action="Index"
+                       style="color: var(--text-muted); font-size: 0.88rem; text-decoration: none; display: flex; align-items: center; gap: 0.4rem; transition: color 0.2s;"
+                       onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-muted)'">
+                        <i class="bi bi-house"></i> Trang chủ
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <script>
+        // Hiện alert validation nếu có lỗi
+        var summary = document.querySelector('[data-valmsg-summary]') ?? document.querySelector('.alert-book');
+        if (summary && summary.querySelectorAll('li').length > 0) {
+            summary.style.display = 'flex';
+        }
+    </script>
+}

@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "328cbnebbfUwGistbjE9UbqMLKibL2JrUUTEFB5iCHk=",
+  "Hash": "LsPSNT7P8plADhWayOE1Iv5jBnoZXva4ga3pe/3lnsQ=",
   "Source": "BookStoreOnline.MVC",
   "BasePath": "_content/BookStoreOnline.MVC",
   "Mode": "Default",
@@ -31,8 +31,8 @@
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
-      "Fingerprint": "ixxg8icosa",
-      "Integrity": "xl8X/bayN6JLZAV4igz5UNPdBoQmzExY/FacmhH852I=",
+      "Fingerprint": "a3bzk4lsei",
+      "Integrity": "Gmk6nCdhqAzXUZtpwcMC6701wyotIs2IEPXvpbwwEh8=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\css\\site.css"
@@ -1279,6 +1279,51 @@
   ],
   "Endpoints": [
     {
+      "Route": "css/site.a3bzk4lsei.css",
+      "AssetFile": "B:\\Project cá nhân\\BookStoreOnline\\BookStoreOnline.MVC\\wwwroot\\css\\site.css",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "22114"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"Gmk6nCdhqAzXUZtpwcMC6701wyotIs2IEPXvpbwwEh8=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sat, 14 Mar 2026 14:30:52 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "a3bzk4lsei"
+        },
+        {
+          "Name": "label",
+          "Value": "css/site.css"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-Gmk6nCdhqAzXUZtpwcMC6701wyotIs2IEPXvpbwwEh8="
+        }
+      ]
+    },
+    {
       "Route": "css/site.css",
       "AssetFile": "B:\\Project cá nhân\\BookStoreOnline\\BookStoreOnline.MVC\\wwwroot\\css\\site.css",
       "Selectors": [],
@@ -1289,7 +1334,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "21461"
+          "Value": "22114"
         },
         {
           "Name": "Content-Type",
@@ -1297,11 +1342,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"xl8X/bayN6JLZAV4igz5UNPdBoQmzExY/FacmhH852I=\""
+          "Value": "\"Gmk6nCdhqAzXUZtpwcMC6701wyotIs2IEPXvpbwwEh8=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Wed, 11 Mar 2026 12:54:28 GMT"
+          "Value": "Sat, 14 Mar 2026 14:30:52 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -1311,52 +1356,7 @@
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-xl8X/bayN6JLZAV4igz5UNPdBoQmzExY/FacmhH852I="
-        }
-      ]
-    },
-    {
-      "Route": "css/site.ixxg8icosa.css",
-      "AssetFile": "B:\\Project cá nhân\\BookStoreOnline\\BookStoreOnline.MVC\\wwwroot\\css\\site.css",
-      "Selectors": [],
-      "ResponseHeaders": [
-        {
-          "Name": "Accept-Ranges",
-          "Value": "bytes"
-        },
-        {
-          "Name": "Content-Length",
-          "Value": "21461"
-        },
-        {
-          "Name": "Content-Type",
-          "Value": "text/css"
-        },
-        {
-          "Name": "ETag",
-          "Value": "\"xl8X/bayN6JLZAV4igz5UNPdBoQmzExY/FacmhH852I=\""
-        },
-        {
-          "Name": "Last-Modified",
-          "Value": "Wed, 11 Mar 2026 12:54:28 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "max-age=31536000, immutable"
-        }
-      ],
-      "EndpointProperties": [
-        {
-          "Name": "fingerprint",
-          "Value": "ixxg8icosa"
-        },
-        {
-          "Name": "label",
-          "Value": "css/site.css"
-        },
-        {
-          "Name": "integrity",
-          "Value": "sha256-xl8X/bayN6JLZAV4igz5UNPdBoQmzExY/FacmhH852I="
+          "Value": "sha256-Gmk6nCdhqAzXUZtpwcMC6701wyotIs2IEPXvpbwwEh8="
         }
       ]
     },

@@ -1,0 +1,152 @@
+@model List<BookStoreOnline.MVC.Models.UserAdminViewModel>
+@{
+    ViewData["Title"] = "Quản lý Người dùng";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var currentAdminIdStr = Context.Session.GetString("UserId");
+    int.TryParse(currentAdminIdStr, out int currentAdminId);
+}
+
+<div class="page-header">
+    <div>
+        <div class="page-header-title">👥 Quản lý Người dùng</div>
+        <div class="page-header-sub">@Model.Count tài khoản trong hệ thống</div>
+    </div>
+</div>
+
+<style>
+    .role-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.2rem 0.65rem;
+        border-radius: 20px;
+        font-size: 0.72rem;
+        font-weight: 700;
+    }
+    .role-admin    { background: rgba(201,168,76,0.15); color: var(--primary); border: 1px solid rgba(201,168,76,0.3); }
+    .role-customer { background: rgba(99,102,241,0.12); color: #818cf8; border: 1px solid rgba(99,102,241,0.3); }
+
+    .ban-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.2rem 0.65rem;
+        border-radius: 20px;
+        font-size: 0.72rem;
+        font-weight: 700;
+    }
+    .status-active { background: rgba(74,222,128,0.12); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
+    .status-banned { background: rgba(248,113,113,0.12); color: #f87171; border: 1px solid rgba(248,113,113,0.3); }
+
+    .btn-ban   { background: rgba(248,113,113,0.12); color: #f87171; border: 1px solid rgba(248,113,113,0.3); border-radius: 7px; padding: 0.3rem 0.8rem; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .btn-ban:hover   { background: rgba(248,113,113,0.3); }
+    .btn-unban { background: rgba(74,222,128,0.12); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); border-radius: 7px; padding: 0.3rem 0.8rem; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .btn-unban:hover { background: rgba(74,222,128,0.3); }
+
+    .search-box {
+        background: rgba(255,255,255,0.04);
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        padding: 0.6rem 1rem;
+        color: var(--text-light);
+        font-size: 0.88rem;
+        width: 280px;
+        outline: none;
+        margin-bottom: 1.25rem;
+    }
+    .search-box:focus { border-color: rgba(201,168,76,0.5); }
+    .search-box::placeholder { color: var(--text-muted); }
+</style>
+
+<div class="admin-card" style="padding:1.5rem 1.5rem 0.5rem;">
+    <input type="text" class="search-box" id="userSearch" placeholder="🔍 Tìm theo tên, email..." oninput="filterUsers()" />
+</div>
+
+<div class="admin-card" style="padding: 0; overflow: hidden; margin-top: 1rem;">
+    <table class="admin-table" id="usersTable">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Tên</th>
+                <th>Email</th>
+                <th>Vai trò</th>
+                <th>Ngày tạo</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model)
+            {
+                var isSelf = user.Id == currentAdminId;
+                <tr data-search="@user.FullName.ToLower() @user.Email.ToLower()">
+                    <td style="color:var(--text-muted);">@user.Id</td>
+                    <td>
+                        <div style="display:flex;align-items:center;gap:0.6rem;">
+                            <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--primary),#6d28d9);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;color:#fff;flex-shrink:0;">
+                                @user.FullName.FirstOrDefault().ToString().ToUpper()
+                            </div>
+                            <span style="font-weight:600;color:var(--text-light);">
+                                @user.FullName
+                                @if (isSelf) { <span style="font-size:0.75rem;color:var(--primary);"> (bạn)</span> }
+                            </span>
+                        </div>
+                    </td>
+                    <td style="color:var(--text-muted);font-size:0.85rem;">@user.Email</td>
+                    <td>
+                        <span class="role-badge @(user.Role == "Admin" ? "role-admin" : "role-customer")">
+                            @(user.Role == "Admin" ? "👑 Admin" : "👤 Customer")
+                        </span>
+                    </td>
+                    <td style="color:var(--text-muted);font-size:0.82rem;">@user.CreatedAt.ToString("dd/MM/yyyy")</td>
+                    <td>
+                        <span class="ban-badge @(user.IsBanned ? "status-banned" : "status-active")">
+                            @(user.IsBanned ? "🔒 Bị khóa" : "✅ Hoạt động")
+                        </span>
+                    </td>
+                    <td>
+                        @if (!isSelf && user.Role != "Admin")
+                        {
+                            if (user.IsBanned)
+                            {
+                                <form method="post" asp-controller="Admin" asp-action="UnbanUser" asp-route-id="@user.Id" style="display:inline;"
+                                      onsubmit="return confirm('Mở khóa tài khoản @user.FullName?')">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn-unban"><i class="bi bi-unlock"></i> Mở khóa</button>
+                                </form>
+                            }
+                            else
+                            {
+                                <form method="post" asp-controller="Admin" asp-action="BanUser" asp-route-id="@user.Id" style="display:inline;"
+                                      onsubmit="return confirm('Khóa tài khoản @user.FullName? Họ sẽ không thể đăng nhập.')">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn-ban"><i class="bi bi-lock"></i> Khóa</button>
+                                </form>
+                            }
+                        }
+                        else if (isSelf)
+                        {
+                            <span style="color:var(--text-muted);font-size:0.8rem;">—</span>
+                        }
+                        else
+                        {
+                            <span style="color:var(--text-muted);font-size:0.8rem;">Không thể khóa</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+<script>
+    function filterUsers() {
+        const q = document.getElementById('userSearch').value.toLowerCase();
+        document.querySelectorAll('#usersTable tbody tr').forEach(row => {
+            const search = row.dataset.search || '';
+            row.style.display = search.includes(q) ? '' : 'none';
+        });
+    }
+</script>
+}

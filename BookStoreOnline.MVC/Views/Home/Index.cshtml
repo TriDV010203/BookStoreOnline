@@ -1,9 +1,9 @@
-﻿@model List<BookStoreOnline.MVC.Models.BookViewModel>
+@model BookStoreOnline.MVC.Models.HomeIndexViewModel
 @{
     ViewData["Title"] = "Trang chủ";
-    var searchVal = ViewData["Search"]?.ToString() ?? "";
     var isLoggedIn = Context.Session.GetString("UserEmail") != null;
     var userName = Context.Session.GetString("UserFullName") ?? "";
+    var searchVal = Model.Search ?? "";
 }
 
 <!-- ===== HERO SECTION ===== -->
@@ -16,7 +16,7 @@
                     <span class="accent">tri thức vô hạn</span>
                 </h1>
                 <p class="hero-subtitle">
-                    Hàng nghìn đầu sách chất lượng cao, từ sách văn học đến khoa học, 
+                    Hàng nghìn đầu sách chất lượng cao, từ sách văn học đến khoa học,
                     kinh doanh và phát triển bản thân — tất cả chỉ trong một nơi.
                 </p>
 
@@ -48,7 +48,7 @@
 
                 <div class="hero-stats">
                     <div class="stat-item">
-                        <span class="stat-number">@Model.Count+</span>
+                        <span class="stat-number">@Model.TotalCount+</span>
                         <span class="stat-label">Đầu sách</span>
                     </div>
                     <div class="stat-item">
@@ -74,28 +74,71 @@
     </div>
 </section>
 
-<!-- ===== SEARCH SECTION ===== -->
+<!-- ===== SEARCH & FILTER SECTION ===== -->
 <section class="search-section">
     <div class="container">
-        <form method="get" asp-controller="Home" asp-action="Index" class="search-form">
-            <input type="text"
-                   name="search"
-                   value="@searchVal"
-                   class="search-input"
-                   placeholder="🔍  Tìm kiếm theo tên sách, tác giả..." />
-            <button type="submit" class="btn-search">
-                <i class="bi bi-search me-1"></i> Tìm kiếm
-            </button>
-            @if (!string.IsNullOrEmpty(searchVal))
-            {
-                <a asp-controller="Home" asp-action="Index"
-                   style="display: flex; align-items: center; color: var(--text-muted); font-size: 0.85rem; white-space: nowrap;">
-                    <i class="bi bi-x-circle me-1"></i> Xóa
-                </a>
-            }
+        <form method="get" asp-controller="Home" asp-action="Index" id="filterForm">
+            <!-- Search Bar -->
+            <div class="search-form" style="margin-bottom: 1rem;">
+                <input type="text"
+                       name="search"
+                       value="@searchVal"
+                       class="search-input"
+                       placeholder="🔍  Tìm kiếm theo tên sách, tác giả..." />
+                <button type="submit" class="btn-search">
+                    <i class="bi bi-search me-1"></i> Tìm kiếm
+                </button>
+                @if (!string.IsNullOrEmpty(searchVal) || Model.CategoryId.HasValue || !string.IsNullOrEmpty(Model.PriceSort))
+                {
+                    <a asp-controller="Home" asp-action="Index"
+                       style="display: flex; align-items: center; color: var(--text-muted); font-size: 0.85rem; white-space: nowrap;">
+                        <i class="bi bi-x-circle me-1"></i> Xóa lọc
+                    </a>
+                }
+            </div>
+
+            <!-- Filters Row -->
+            <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center;">
+                <!-- Category Filter -->
+                <select name="categoryId" class="filter-select" onchange="this.form.submit()">
+                    <option value="">📚 Tất cả thể loại</option>
+                    @foreach (var cat in Model.Categories)
+                    {
+                        if (Model.CategoryId == cat.Id)
+                        {
+                            <option value="@cat.Id" selected>@cat.Name</option>
+                        }
+                        else
+                        {
+                            <option value="@cat.Id">@cat.Name</option>
+                        }
+                    }
+                </select>
+
+                <!-- Price Sort -->
+                <select name="priceSort" class="filter-select" onchange="this.form.submit()">
+                    <option value="">💰 Sắp xếp theo giá</option>
+                    @if (Model.PriceSort == "asc")
+                    {
+                        <option value="asc" selected>⬆ Giá thấp → cao</option>
+                        <option value="desc">⬇ Giá cao → thấp</option>
+                    }
+                    else if (Model.PriceSort == "desc")
+                    {
+                        <option value="asc">⬆ Giá thấp → cao</option>
+                        <option value="desc" selected>⬇ Giá cao → thấp</option>
+                    }
+                    else
+                    {
+                        <option value="asc">⬆ Giá thấp → cao</option>
+                        <option value="desc">⬇ Giá cao → thấp</option>
+                    }
+                </select>
+            </div>
         </form>
     </div>
 </section>
+
 
 <!-- ===== BOOKS SECTION ===== -->
 <section class="books-section">
@@ -106,17 +149,22 @@
                 {
                     <span>Kết quả cho "<span class="gold">@searchVal</span>"</span>
                 }
+                else if (Model.CategoryId.HasValue)
+                {
+                    var catName = Model.Categories.FirstOrDefault(c => c.Id == Model.CategoryId)?.Name ?? "Thể loại";
+                    <span>Sách <span class="gold">@catName</span></span>
+                }
                 else
                 {
                     <span>Tất cả <span class="gold">sách</span></span>
                 }
             </h2>
             <span class="books-count">
-                <i class="bi bi-book me-1"></i>@Model.Count cuốn sách
+                <i class="bi bi-book me-1"></i>@Model.TotalCount cuốn sách
             </span>
         </div>
 
-        @if (Model == null || Model.Count == 0)
+        @if (Model.Books == null || Model.Books.Count == 0)
         {
             <div class="empty-state">
                 <div class="empty-icon">📭</div>
@@ -128,21 +176,18 @@
                     }
                     else
                     {
-                        <span>Chưa có sách nào trong hệ thống. Vui lòng quay lại sau.</span>
+                        <span>Chưa có sách nào phù hợp với bộ lọc. Hãy thử điều chỉnh.</span>
                     }
                 </p>
-                @if (!string.IsNullOrEmpty(searchVal))
-                {
-                    <a asp-controller="Home" asp-action="Index" style="color: var(--primary);">
-                        <i class="bi bi-arrow-left me-1"></i> Xem tất cả sách
-                    </a>
-                }
+                <a asp-controller="Home" asp-action="Index" style="color: var(--primary);">
+                    <i class="bi bi-arrow-left me-1"></i> Xem tất cả sách
+                </a>
             </div>
         }
         else
         {
             <div class="row g-4">
-                @foreach (var book in Model)
+                @foreach (var book in Model.Books)
                 {
                     <div class="col-6 col-md-4 col-lg-3">
                         <div class="book-card">
@@ -183,16 +228,28 @@
                                     </span>
                                 </div>
 
+                                <div class="d-flex gap-2 mt-1">
+                                    <a asp-controller="Home" asp-action="Detail" asp-route-id="@book.Id"
+                                       class="btn-detail-book" style="flex: 1; text-align: center; text-decoration: none;">
+                                        <i class="bi bi-eye me-1"></i> Xem chi tiết
+                                    </a>
+                                </div>
                                 @if (isLoggedIn)
                                 {
-                                    <button class="btn-add-cart" onclick="addToCartNotify('@book.Title')">
-                                        <i class="bi bi-cart-plus me-1"></i> Thêm vào giỏ
-                                    </button>
+                                    <form method="post" asp-controller="Cart" asp-action="Add" style="margin-top: 0.4rem;">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="bookId" value="@book.Id" />
+                                        <input type="hidden" name="quantity" value="1" />
+                                        <input type="hidden" name="returnUrl" value="/" />
+                                        <button type="submit" class="btn-add-cart" style="width:100%;">
+                                            <i class="bi bi-cart-plus me-1"></i> Thêm vào giỏ
+                                        </button>
+                                    </form>
                                 }
                                 else
                                 {
                                     <a asp-controller="Account" asp-action="Login"
-                                       class="btn-add-cart" style="display: block; text-align: center; text-decoration: none;">
+                                       class="btn-add-cart" style="display: block; text-align: center; text-decoration: none; margin-top: 0.4rem;">
                                         <i class="bi bi-box-arrow-in-right me-1"></i> Đăng nhập để mua
                                     </a>
                                 }
@@ -201,33 +258,99 @@
                     </div>
                 }
             </div>
+
+            <!-- Pagination -->
+            @if (Model.TotalPages > 1)
+            {
+                <div style="display: flex; justify-content: center; align-items: center; gap: 0.5rem; margin-top: 2.5rem; flex-wrap: wrap;">
+                    @if (Model.Page > 1)
+                    {
+                        <a asp-controller="Home" asp-action="Index"
+                           asp-route-search="@Model.Search"
+                           asp-route-categoryId="@Model.CategoryId"
+                           asp-route-priceSort="@Model.PriceSort"
+                           asp-route-page="@(Model.Page - 1)"
+                           class="page-btn">
+                            <i class="bi bi-chevron-left"></i>
+                        </a>
+                    }
+
+                    @for (int p = 1; p <= Model.TotalPages; p++)
+                    {
+                        <a asp-controller="Home" asp-action="Index"
+                           asp-route-search="@Model.Search"
+                           asp-route-categoryId="@Model.CategoryId"
+                           asp-route-priceSort="@Model.PriceSort"
+                           asp-route-page="@p"
+                           class="page-btn @(p == Model.Page ? "active" : "")">
+                            @p
+                        </a>
+                    }
+
+                    @if (Model.Page < Model.TotalPages)
+                    {
+                        <a asp-controller="Home" asp-action="Index"
+                           asp-route-search="@Model.Search"
+                           asp-route-categoryId="@Model.CategoryId"
+                           asp-route-priceSort="@Model.PriceSort"
+                           asp-route-page="@(Model.Page + 1)"
+                           class="page-btn">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    }
+                </div>
+                <p style="text-align: center; color: var(--text-muted); font-size: 0.82rem; margin-top: 0.75rem;">
+                    Trang @Model.Page / @Model.TotalPages · @Model.TotalCount sách
+                </p>
+            }
         }
     </div>
 </section>
 
-@section Scripts {
-<script>
-    function addToCartNotify(title) {
-        // Toast thông báo thêm vào giỏ (UI placeholder, backend sẽ implement sau)
-        var container = document.createElement('div');
-        container.className = 'toast-container-book';
-        container.style.cssText = 'position:fixed;top:1.2rem;right:1.2rem;z-index:9999';
-
-        var toast = document.createElement('div');
-        toast.className = 'toast-book success';
-        toast.innerHTML = `
-            <i class="bi bi-cart-check-fill" style="color:#4ade80;font-size:1.1rem;flex-shrink:0;"></i>
-            <span class="toast-text">Đã thêm "<strong>${title}</strong>" vào giỏ hàng!</span>
-            <button class="toast-close" onclick="this.closest('.toast-container-book').remove()">
-                <i class="bi bi-x-lg"></i>
-            </button>
-        `;
-        container.appendChild(toast);
-        document.body.appendChild(container);
-        setTimeout(() => {
-            toast.style.animation = 'slideOut 0.3s ease forwards';
-            setTimeout(() => container.remove(), 350);
-        }, 3000);
+@section Styles {
+<style>
+    .filter-select, .filter-input {
+        background: rgba(255,255,255,0.05);
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        padding: 0.55rem 1rem;
+        color: var(--text-light);
+        font-size: 0.88rem;
+        outline: none;
+        transition: border-color 0.2s;
     }
-</script>
+    .filter-select:focus, .filter-input:focus { border-color: rgba(201,168,76,0.5); }
+    .filter-select option { background: #16181f; }
+    .filter-input::placeholder { color: var(--text-muted); }
+
+    .btn-filter {
+        background: rgba(201,168,76,0.12);
+        border: 1px solid rgba(201,168,76,0.35);
+        color: var(--primary);
+        border-radius: 10px;
+        padding: 0.55rem 1.25rem;
+        font-size: 0.88rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .btn-filter:hover { background: var(--primary); color: #0a0a0f; }
+
+    .page-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 38px; height: 38px;
+        border-radius: 10px;
+        font-size: 0.88rem;
+        font-weight: 600;
+        text-decoration: none;
+        color: var(--text-muted);
+        border: 1px solid var(--border-color);
+        background: rgba(255,255,255,0.03);
+        transition: all 0.2s;
+    }
+    .page-btn:hover { border-color: rgba(201,168,76,0.4); color: var(--primary); }
+    .page-btn.active { background: var(--primary); color: #0a0a0f; border-color: var(--primary); font-weight: 700; }
+</style>
 }

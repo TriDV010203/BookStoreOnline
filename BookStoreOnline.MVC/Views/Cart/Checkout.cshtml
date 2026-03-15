@@ -1,0 +1,213 @@
+@model BookStoreOnline.MVC.Models.CheckoutViewModel
+@{
+    ViewData["Title"] = "Đặt hàng";
+}
+
+@section Styles {
+<style>
+    .checkout-page { padding: 3rem 0 5rem; }
+
+    .checkout-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.9rem;
+        font-weight: 700;
+        color: var(--text-light);
+        margin-bottom: 0.25rem;
+    }
+
+    .checkout-subtitle {
+        color: var(--text-muted);
+        font-size: 0.88rem;
+        margin-bottom: 2rem;
+    }
+
+    .checkout-card {
+        background: var(--dark-card);
+        border: 1px solid var(--border-color);
+        border-radius: 18px;
+        padding: 1.75rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .checkout-card-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--text-light);
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .checkout-card-title i { color: var(--primary); }
+
+    .checkout-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .checkout-item:last-child { border-bottom: none; }
+
+    .checkout-item-img {
+        width: 48px;
+        height: 62px;
+        object-fit: cover;
+        border-radius: 6px;
+        flex-shrink: 0;
+    }
+
+    .checkout-item-placeholder {
+        width: 48px;
+        height: 62px;
+        background: var(--dark-card2, #16153a);
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        flex-shrink: 0;
+    }
+
+    .checkout-item-title {
+        font-weight: 700;
+        font-size: 0.88rem;
+        color: var(--text-light);
+        margin-bottom: 0.15rem;
+    }
+
+    .checkout-item-meta {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+    }
+
+    .checkout-item-sub {
+        margin-left: auto;
+        font-weight: 800;
+        color: var(--primary);
+        font-size: 0.95rem;
+        white-space: nowrap;
+    }
+
+    .checkout-total-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: 800;
+        font-size: 1.15rem;
+        color: var(--text-light);
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .checkout-total-row span:last-child { color: var(--primary); }
+
+    .btn-place-order {
+        width: 100%;
+        background: linear-gradient(135deg, var(--primary), #8a6e2f);
+        color: var(--dark-bg);
+        border: none;
+        padding: 0.9rem;
+        border-radius: 14px;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.25s;
+        margin-top: 1.25rem;
+        letter-spacing: 0.3px;
+    }
+
+    .btn-place-order:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(201,168,76,0.35);
+    }
+</style>
+}
+
+<section class="checkout-page">
+    <div class="container">
+        <h1 class="checkout-title"><i class="bi bi-bag-check me-2"></i>Xác nhận đơn hàng</h1>
+        <p class="checkout-subtitle">Kiểm tra lại đơn hàng và nhập địa chỉ giao hàng</p>
+
+        <div class="row g-4">
+            <!-- Shipping form -->
+            <div class="col-12 col-lg-7">
+                <div class="checkout-card">
+                    <div class="checkout-card-title">
+                        <i class="bi bi-geo-alt"></i> Thông tin giao hàng
+                    </div>
+
+                    <form method="post" asp-controller="Cart" asp-action="Checkout" id="checkoutForm">
+                        @Html.AntiForgeryToken()
+
+                        <div asp-validation-summary="ModelOnly" class="alert-book alert-danger-book mb-3"></div>
+
+                        <div class="form-group-book">
+                            <label class="form-label-book" asp-for="ShippingAddress">
+                                <i class="bi bi-house me-1"></i>Địa chỉ giao hàng
+                            </label>
+                            <textarea asp-for="ShippingAddress"
+                                      class="form-control-book"
+                                      rows="3"
+                                      placeholder="Ví dụ: 123 Đường ABC, Quận 1, TP.HCM..."></textarea>
+                            <span asp-validation-for="ShippingAddress" class="field-error"></span>
+                        </div>
+
+                        <button type="submit" class="btn-place-order">
+                            <i class="bi bi-check2-circle me-2"></i>Xác nhận đặt hàng
+                        </button>
+                    </form>
+                </div>
+
+                <a asp-controller="Cart" asp-action="Index"
+                   style="color: var(--text-muted); font-size: 0.88rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; transition: color 0.2s;"
+                   onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-muted)'">
+                    <i class="bi bi-arrow-left"></i> Quay lại giỏ hàng
+                </a>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="col-12 col-lg-5">
+                <div class="checkout-card">
+                    <div class="checkout-card-title">
+                        <i class="bi bi-receipt"></i> Đơn hàng (@Model.Items.Count sản phẩm)
+                    </div>
+
+                    @foreach (var item in Model.Items)
+                    {
+                        <div class="checkout-item">
+                            @if (!string.IsNullOrEmpty(item.ImageUrl))
+                            {
+                                <img src="@item.ImageUrl" alt="@item.Title" class="checkout-item-img" />
+                            }
+                            else
+                            {
+                                <div class="checkout-item-placeholder">📖</div>
+                            }
+                            <div>
+                                <div class="checkout-item-title">@item.Title</div>
+                                <div class="checkout-item-meta">x@item.Quantity &nbsp;·&nbsp; @item.UnitPrice.ToString("N0")₫/cuốn</div>
+                            </div>
+                            <div class="checkout-item-sub">@item.SubTotal.ToString("N0")₫</div>
+                        </div>
+                    }
+
+                    <div class="checkout-total-row">
+                        <span>Tổng thanh toán</span>
+                        <span>@Model.TotalAmount.ToString("N0")₫</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

@@ -1,0 +1,144 @@
+@model List<BookStoreOnline.MVC.Models.OrderViewModel>
+@{
+    ViewData["Title"] = "Quản lý Đơn hàng";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var statusFilter = ViewData["StatusFilter"]?.ToString() ?? "";
+
+    string BadgeClass(string s) => s switch
+    {
+        "Pending"    => "badge-warning",
+        "Processing" => "badge-info",
+        "Shipped"    => "badge-primary",
+        "Delivered"  => "badge-success",
+        "Cancelled"  => "badge-danger",
+        _            => "badge-secondary"
+    };
+
+    string StatusLabel(string s) => s switch
+    {
+        "Pending"    => "⏳ Chờ xác nhận",
+        "Processing" => "📦 Đang chuẩn bị",
+        "Shipped"    => "🚚 Đang giao",
+        "Delivered"  => "✅ Đã giao",
+        "Cancelled"  => "❌ Đã hủy",
+        _ => s
+    };
+}
+
+<style>
+    .badge-warning   { background: rgba(251,191,36,0.15); color: #fbbf24; border: 1px solid rgba(251,191,36,0.3); }
+    .badge-info      { background: rgba(99,102,241,0.15); color: #818cf8; border: 1px solid rgba(99,102,241,0.3); }
+    .badge-primary   { background: rgba(6,182,212,0.15); color: #22d3ee; border: 1px solid rgba(6,182,212,0.3); }
+    .badge-success   { background: rgba(74,222,128,0.15); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
+    .badge-danger    { background: rgba(248,113,113,0.15); color: #f87171; border: 1px solid rgba(248,113,113,0.3); }
+    .badge-secondary { background: rgba(148,163,184,0.15); color: #94a3b8; border: 1px solid rgba(148,163,184,0.3); }
+
+    .status-badge-sm {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.25rem 0.7rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .filter-tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .filter-tab {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.4rem 1rem;
+        border-radius: 20px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        text-decoration: none;
+        border: 1px solid var(--border-color);
+        color: var(--text-muted);
+        transition: all 0.2s;
+    }
+
+    .filter-tab:hover, .filter-tab.active {
+        background: var(--primary);
+        color: #0a0a0f;
+        border-color: var(--primary);
+    }
+</style>
+
+<div class="page-header">
+    <div>
+        <div class="page-header-title">📋 Quản lý Đơn hàng</div>
+        <div class="page-header-sub">@Model.Count đơn hàng @(string.IsNullOrEmpty(statusFilter) ? "tất cả" : $"({StatusLabel(statusFilter)})")</div>
+    </div>
+</div>
+
+<!-- Filter Tabs -->
+<div class="filter-tabs">
+    <a asp-controller="Admin" asp-action="Orders"
+       class="filter-tab @(string.IsNullOrEmpty(statusFilter) ? "active" : "")">
+        Tất cả
+    </a>
+    @foreach (var s in new[] { "Pending", "Processing", "Shipped", "Delivered", "Cancelled" })
+    {
+        <a asp-controller="Admin" asp-action="Orders" asp-route-status="@s"
+           class="filter-tab @(statusFilter == s ? "active" : "")">
+            @StatusLabel(s)
+        </a>
+    }
+</div>
+
+<div class="admin-card" style="padding: 0; overflow: hidden;">
+    @if (Model.Count == 0)
+    {
+        <div style="text-align:center;padding:3rem;color:var(--text-muted);">
+            <div style="font-size:3rem;margin-bottom:1rem;">📭</div>
+            <div>Không có đơn hàng nào</div>
+        </div>
+    }
+    else
+    {
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Mã ĐH</th>
+                    <th>Người mua</th>
+                    <th>Ngày đặt</th>
+                    <th>Tổng tiền</th>
+                    <th>Trạng thái</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in Model)
+                {
+                    <tr>
+                        <td style="font-weight:700;color:var(--primary);">#@order.Id</td>
+                        <td>
+                            <div style="font-weight:600;color:var(--text-light);">@(order.UserFullName ?? "—")</div>
+                            <div style="font-size:0.78rem;color:var(--text-muted);">@order.UserEmail</div>
+                        </td>
+                        <td style="color:var(--text-muted);font-size:0.85rem;">@order.OrderDate.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td style="font-weight:700;color:var(--primary);">@order.TotalAmount.ToString("N0")₫</td>
+                        <td>
+                            <span class="status-badge-sm @BadgeClass(order.OrderStatus)">
+                                @StatusLabel(order.OrderStatus)
+                            </span>
+                        </td>
+                        <td>
+                            <a asp-controller="Admin" asp-action="OrderDetail" asp-route-id="@order.Id"
+                               class="btn-admin-secondary" style="font-size:0.8rem;padding:0.3rem 0.8rem;">
+                                <i class="bi bi-eye"></i> Chi tiết
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

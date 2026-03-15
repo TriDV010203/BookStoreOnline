@@ -622,6 +622,20 @@
                 <i class="bi bi-tag"></i>
                 Danh mục
             </a>
+            <a asp-controller="Admin" asp-action="Orders"
+               class="sidebar-nav-item @(new[]{"Orders","OrderDetail"}.Contains(ViewContext.RouteData.Values["action"]?.ToString()) ? "active" : "")">
+                <i class="bi bi-receipt"></i>
+                Đơn hàng
+            </a>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Người dùng</div>
+            <a asp-controller="Admin" asp-action="Users"
+               class="sidebar-nav-item @(ViewContext.RouteData.Values["action"]?.ToString() == "Users" ? "active" : "")">
+                <i class="bi bi-people"></i>
+                Quản lý Users
+            </a>
         </div>
 
         <div class="sidebar-section">
@@ -631,6 +645,7 @@
                 Xem cửa hàng
             </a>
         </div>
+
 
         <div class="sidebar-footer">
             <div class="sidebar-user">

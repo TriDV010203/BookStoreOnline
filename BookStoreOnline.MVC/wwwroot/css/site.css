@@ -565,6 +565,34 @@ main {
     transform: translateY(-1px);
 }
 
+/* View Details button on book cards */
+.btn-detail-book {
+    display: block;
+    width: 100%;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+    padding: 0.5rem 1rem;
+    border-radius: 30px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+    letter-spacing: 0.3px;
+    box-sizing: border-box;
+}
+
+.btn-detail-book:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: translateY(-1px);
+}
+
+/* Cart icon on navbar */
+.cart-icon-btn:hover {
+    color: var(--primary) !important;
+}
+
 /* =============================================
    EMPTY STATE
    ============================================= */

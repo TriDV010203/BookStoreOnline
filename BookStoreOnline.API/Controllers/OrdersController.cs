@@ -15,13 +15,15 @@ namespace BookStoreOnline.API.Controllers
             _context = context;
         }
 
-        // 1. Lấy danh sách Đơn hàng (Kèm theo chi tiết từng cuốn sách bên trong)
+        // 1. Lấy danh sách Đơn hàng (Dành cho Admin)
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Order>>> GetOrders()
         {
             return await _context.Orders
+                .Include(o => o.User)
                 .Include(o => o.OrderDetails)
                 .ThenInclude(od => od.Book)
+                .OrderByDescending(o => o.OrderDate)
                 .ToListAsync();
         }
 
@@ -56,7 +58,6 @@ namespace BookStoreOnline.API.Controllers
         [HttpPost]
         public async Task<ActionResult<Order>> PostOrder(Order order)
         {
-            // Tránh EF Core tự động tạo lại User và Book mới
             order.User = null;
 
             if (order.OrderDetails != null)
@@ -65,7 +66,6 @@ namespace BookStoreOnline.API.Controllers
                 {
                     detail.Book = null;
 
-                    // Trừ số lượng tồn kho
                     var book = await _context.Books.FindAsync(detail.BookId);
                     if (book == null)
                         return BadRequest($"Không tìm thấy sách ID {detail.BookId}.");
@@ -82,5 +82,40 @@ namespace BookStoreOnline.API.Controllers
 
             return CreatedAtAction("GetOrder", new { id = order.Id }, order);
         }
+
+        // 5. Cập nhật trạng thái đơn hàng — nếu hủy thì hoàn trả tồn kho
+        [HttpPatch("{id}/status")]
+        public async Task<IActionResult> UpdateOrderStatus(int id, [FromBody] UpdateOrderStatusRequest request)
+        {
+            var order = await _context.Orders
+                .Include(o => o.OrderDetails)
+                .FirstOrDefaultAsync(o => o.Id == id);
+
+            if (order == null) return NotFound("Không tìm thấy đơn hàng.");
+
+            var validStatuses = new[] { "Pending", "Processing", "Shipped", "Delivered", "Cancelled" };
+            if (!validStatuses.Contains(request.Status))
+                return BadRequest("Trạng thái không hợp lệ.");
+
+            // Nếu chuyển sang Cancelled → hoàn trả tồn kho
+            if (request.Status == "Cancelled" && order.OrderStatus != "Cancelled")
+            {
+                foreach (var detail in order.OrderDetails!)
+                {
+                    var book = await _context.Books.FindAsync(detail.BookId);
+                    if (book != null)
+                        book.StockQuantity += detail.Quantity;
+                }
+            }
+
+            order.OrderStatus = request.Status;
+            await _context.SaveChangesAsync();
+            return Ok("Cập nhật trạng thái thành công.");
+        }
+    }
+
+    public class UpdateOrderStatusRequest
+    {
+        public string Status { get; set; } = string.Empty;
     }
 }

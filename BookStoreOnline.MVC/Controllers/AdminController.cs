@@ -23,10 +23,15 @@ namespace BookStoreOnline.MVC.Controllers
         {
             var books = await _apiService.GetBooksAsync();
             var categories = await _apiService.GetCategoriesAsync();
+            var orders = await _apiService.GetAllOrdersAsync();
+            var users = await _apiService.GetAllUsersAsync();
 
             ViewData["TotalBooks"] = books.Count;
             ViewData["TotalCategories"] = categories.Count;
             ViewData["TotalStock"] = books.Sum(b => b.StockQuantity);
+            ViewData["TotalOrders"] = orders.Count;
+            ViewData["TotalRevenue"] = orders.Where(o => o.OrderStatus != "Cancelled").Sum(o => o.TotalAmount);
+            ViewData["TotalUsers"] = users.Count;
             ViewData["RecentBooks"] = books.Take(5).ToList();
 
             return View();
@@ -40,7 +45,6 @@ namespace BookStoreOnline.MVC.Controllers
         public async Task<IActionResult> Categories()
         {
             var categories = await _apiService.GetCategoriesAsync();
-            // Lấy số sách mỗi category
             var books = await _apiService.GetBooksAsync();
             foreach (var cat in categories)
                 cat.BookCount = books.Count(b => b.CategoryId == cat.Id);
@@ -222,6 +226,91 @@ namespace BookStoreOnline.MVC.Controllers
                 TempData["ErrorMessage"] = message;
 
             return RedirectToAction("Books");
+        }
+
+        // =====================================================================
+        // ORDERS
+        // =====================================================================
+
+        [HttpGet]
+        public async Task<IActionResult> Orders(string? status)
+        {
+            var orders = await _apiService.GetAllOrdersAsync();
+            if (!string.IsNullOrEmpty(status))
+                orders = orders.Where(o => o.OrderStatus == status).ToList();
+
+            ViewData["StatusFilter"] = status ?? "";
+            return View(orders);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> OrderDetail(int id)
+        {
+            var order = await _apiService.GetOrderDetailAsync(id);
+            if (order == null)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy đơn hàng.";
+                return RedirectToAction("Orders");
+            }
+            return View(order);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateOrderStatus(int id, string status)
+        {
+            var (success, message) = await _apiService.UpdateOrderStatusAsync(id, status);
+            if (success)
+                TempData["SuccessMessage"] = message;
+            else
+                TempData["ErrorMessage"] = message;
+
+            return RedirectToAction("OrderDetail", new { id });
+        }
+
+        // =====================================================================
+        // USERS
+        // =====================================================================
+
+        [HttpGet]
+        public async Task<IActionResult> Users()
+        {
+            var users = await _apiService.GetAllUsersAsync();
+            return View(users);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> BanUser(int id)
+        {
+            // Không thể tự ban chính mình
+            var selfIdStr = HttpContext.Session.GetString("UserId");
+            if (int.TryParse(selfIdStr, out int selfId) && selfId == id)
+            {
+                TempData["ErrorMessage"] = "Bạn không thể khóa tài khoản của chính mình!";
+                return RedirectToAction("Users");
+            }
+
+            var (success, message) = await _apiService.BanUserAsync(id);
+            if (success)
+                TempData["SuccessMessage"] = message;
+            else
+                TempData["ErrorMessage"] = message;
+
+            return RedirectToAction("Users");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UnbanUser(int id)
+        {
+            var (success, message) = await _apiService.UnbanUserAsync(id);
+            if (success)
+                TempData["SuccessMessage"] = message;
+            else
+                TempData["ErrorMessage"] = message;
+
+            return RedirectToAction("Users");
         }
     }
 }

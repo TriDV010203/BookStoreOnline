@@ -298,5 +298,178 @@ namespace BookStoreOnline.MVC.Services
             }
             catch (Exception ex) { return (false, $"Lỗi kết nối: {ex.Message}"); }
         }
+
+        public async Task<List<OrderViewModel>> GetOrdersByUserAsync(int userId)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"api/orders/user/{userId}");
+                if (response.IsSuccessStatusCode)
+                {
+                    var data = await response.Content.ReadFromJsonAsync<List<ApiOrderDto>>(_jsonOptions);
+                    return data?.Select(MapToOrderViewModel).ToList() ?? new();
+                }
+                return new();
+            }
+            catch { return new(); }
+        }
+
+        public async Task<List<OrderViewModel>> GetAllOrdersAsync()
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync("api/orders");
+                if (response.IsSuccessStatusCode)
+                {
+                    var data = await response.Content.ReadFromJsonAsync<List<ApiOrderDto>>(_jsonOptions);
+                    return data?.Select(MapToOrderViewModel).ToList() ?? new();
+                }
+                return new();
+            }
+            catch { return new(); }
+        }
+
+        public async Task<OrderViewModel?> GetOrderDetailAsync(int orderId)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"api/orders/{orderId}");
+                if (response.IsSuccessStatusCode)
+                {
+                    var data = await response.Content.ReadFromJsonAsync<ApiOrderDto>(_jsonOptions);
+                    return data != null ? MapToOrderViewModel(data) : null;
+                }
+                return null;
+            }
+            catch { return null; }
+        }
+
+        public async Task<(bool success, string message)> UpdateOrderStatusAsync(int orderId, string status)
+        {
+            try
+            {
+                var payload = new { status };
+                var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
+                var response = await _httpClient.PatchAsync($"api/orders/{orderId}/status", content);
+                if (response.IsSuccessStatusCode)
+                    return (true, "Cập nhật trạng thái thành công!");
+                var err = await response.Content.ReadAsStringAsync();
+                return (false, err.Trim('"'));
+            }
+            catch (Exception ex) { return (false, $"Lỗi kết nối: {ex.Message}"); }
+        }
+
+        // =====================================================================
+        // USERS (ADMIN)
+        // =====================================================================
+
+        public async Task<List<UserAdminViewModel>> GetAllUsersAsync()
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync("api/users");
+                if (response.IsSuccessStatusCode)
+                {
+                    var users = await response.Content.ReadFromJsonAsync<List<UserAdminViewModel>>(_jsonOptions);
+                    return users ?? new();
+                }
+                return new();
+            }
+            catch { return new(); }
+        }
+
+        public async Task<(bool success, string message)> BanUserAsync(int userId)
+        {
+            try
+            {
+                var content = new StringContent("{}", Encoding.UTF8, "application/json");
+                var response = await _httpClient.PatchAsync($"api/users/{userId}/ban", content);
+                if (response.IsSuccessStatusCode)
+                    return (true, "Đã khóa tài khoản thành công.");
+                var err = await response.Content.ReadAsStringAsync();
+                return (false, err.Trim('"'));
+            }
+            catch (Exception ex) { return (false, $"Lỗi kết nối: {ex.Message}"); }
+        }
+
+        public async Task<(bool success, string message)> UnbanUserAsync(int userId)
+        {
+            try
+            {
+                var content = new StringContent("{}", Encoding.UTF8, "application/json");
+                var response = await _httpClient.PatchAsync($"api/users/{userId}/unban", content);
+                if (response.IsSuccessStatusCode)
+                    return (true, "Đã mở khóa tài khoản thành công.");
+                var err = await response.Content.ReadAsStringAsync();
+                return (false, err.Trim('"'));
+            }
+            catch (Exception ex) { return (false, $"Lỗi kết nối: {ex.Message}"); }
+        }
+
+        // =====================================================================
+        // HELPERS
+        // =====================================================================
+
+        private static OrderViewModel MapToOrderViewModel(ApiOrderDto dto)
+        {
+            return new OrderViewModel
+            {
+                Id = dto.Id,
+                OrderDate = dto.OrderDate,
+                TotalAmount = dto.TotalAmount,
+                OrderStatus = dto.OrderStatus,
+                ShippingAddress = dto.ShippingAddress,
+                UserId = dto.UserId,
+                UserFullName = dto.User?.FullName,
+                UserEmail = dto.User?.Email,
+                OrderDetails = dto.OrderDetails?.Select(d => new OrderDetailViewModel
+                {
+                    Id = d.Id,
+                    BookId = d.BookId,
+                    BookTitle = d.Book?.Title ?? $"Sách #{d.BookId}",
+                    BookAuthor = d.Book?.Author,
+                    BookImageUrl = d.Book?.ImageUrl,
+                    Quantity = d.Quantity,
+                    UnitPrice = d.UnitPrice
+                }).ToList() ?? new()
+            };
+        }
+
+        // DTO classes for deserializing API responses
+        private class ApiOrderDto
+        {
+            public int Id { get; set; }
+            public int UserId { get; set; }
+            public ApiUserDto? User { get; set; }
+            public DateTime OrderDate { get; set; }
+            public decimal TotalAmount { get; set; }
+            public string OrderStatus { get; set; } = "";
+            public string ShippingAddress { get; set; } = "";
+            public List<ApiOrderDetailDto>? OrderDetails { get; set; }
+        }
+
+        private class ApiOrderDetailDto
+        {
+            public int Id { get; set; }
+            public int BookId { get; set; }
+            public ApiBookDto? Book { get; set; }
+            public int Quantity { get; set; }
+            public decimal UnitPrice { get; set; }
+        }
+
+        private class ApiUserDto
+        {
+            public int Id { get; set; }
+            public string FullName { get; set; } = "";
+            public string Email { get; set; } = "";
+        }
+
+        private class ApiBookDto
+        {
+            public int Id { get; set; }
+            public string Title { get; set; } = "";
+            public string? Author { get; set; }
+            public string? ImageUrl { get; set; }
+        }
     }
 }

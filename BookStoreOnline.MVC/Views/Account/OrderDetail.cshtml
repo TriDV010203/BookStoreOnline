@@ -1,0 +1,221 @@
+@model BookStoreOnline.MVC.Models.OrderViewModel
+@{
+    ViewData["Title"] = $"Chi tiết đơn hàng #{Model.Id}";
+    var isAdmin = Context.Session.GetString("UserRole") == "Admin";
+    var backUrl = isAdmin
+        ? Url.Action("OrderDetail", "Admin", new { id = Model.Id })
+        : Url.Action("MyOrders", "Account");
+}
+
+@section Styles {
+<style>
+    .order-detail-page { padding: 3rem 0 5rem; }
+
+    .detail-card {
+        background: var(--dark-card);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 1.75rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .detail-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--text-light);
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .detail-title i { color: var(--primary); }
+
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.65rem 0;
+        border-bottom: 1px solid rgba(255,255,255,0.04);
+        font-size: 0.9rem;
+    }
+
+    .info-label { color: var(--text-muted); }
+    .info-value { color: var(--text-light); font-weight: 500; }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.3rem 0.85rem;
+        border-radius: 20px;
+        font-size: 0.78rem;
+        font-weight: 600;
+    }
+
+    .status-pending    { background: rgba(251,191,36,0.15); color: #fbbf24; border: 1px solid rgba(251,191,36,0.3); }
+    .status-processing { background: rgba(99,102,241,0.15); color: #818cf8; border: 1px solid rgba(99,102,241,0.3); }
+    .status-shipped    { background: rgba(6,182,212,0.15); color: #22d3ee; border: 1px solid rgba(6,182,212,0.3); }
+    .status-delivered  { background: rgba(74,222,128,0.15); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
+    .status-cancelled  { background: rgba(248,113,113,0.15); color: #f87171; border: 1px solid rgba(248,113,113,0.3); }
+
+    .items-table { width: 100%; border-collapse: collapse; }
+
+    .items-table th {
+        text-align: left;
+        padding: 0.75rem 0.5rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .items-table td {
+        padding: 0.85rem 0.5rem;
+        border-bottom: 1px solid rgba(255,255,255,0.04);
+        font-size: 0.9rem;
+        color: var(--text-light);
+        vertical-align: middle;
+    }
+
+    .book-img-thumb {
+        width: 38px;
+        height: 52px;
+        object-fit: cover;
+        border-radius: 5px;
+        margin-right: 0.6rem;
+    }
+
+    .total-row td {
+        font-weight: 700;
+        color: var(--primary);
+        font-size: 1rem;
+        border-bottom: none;
+        padding-top: 1rem;
+    }
+
+    .btn-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        color: var(--text-muted);
+        font-size: 0.88rem;
+        text-decoration: none;
+        transition: color 0.2s;
+        margin-bottom: 1.5rem;
+    }
+
+    .btn-back:hover { color: var(--primary); }
+</style>
+}
+
+<section class="order-detail-page">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-9">
+                <a asp-controller="Account" asp-action="MyOrders" class="btn-back">
+                    <i class="bi bi-arrow-left"></i> Quay lại danh sách đơn hàng
+                </a>
+
+                @{
+                    var statusClass = Model.OrderStatus switch
+                    {
+                        "Pending"    => "status-pending",
+                        "Processing" => "status-processing",
+                        "Shipped"    => "status-shipped",
+                        "Delivered"  => "status-delivered",
+                        "Cancelled"  => "status-cancelled",
+                        _            => "status-pending"
+                    };
+                    var statusText = Model.OrderStatus switch
+                    {
+                        "Pending"    => "⏳ Chờ xác nhận",
+                        "Processing" => "📦 Đang chuẩn bị hàng",
+                        "Shipped"    => "🚚 Đang giao",
+                        "Delivered"  => "✅ Đã giao thành công",
+                        "Cancelled"  => "❌ Đã hủy",
+                        _            => Model.OrderStatus
+                    };
+                }
+
+                <!-- Order Info -->
+                <div class="detail-card">
+                    <div class="detail-title">
+                        <i class="bi bi-receipt"></i> Đơn hàng #@Model.Id
+                        <span class="ms-auto status-badge @statusClass">@statusText</span>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label"><i class="bi bi-calendar3 me-1"></i>Ngày đặt</span>
+                        <span class="info-value">@Model.OrderDate.ToString("dd/MM/yyyy HH:mm")</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label"><i class="bi bi-geo-alt me-1"></i>Địa chỉ giao hàng</span>
+                        <span class="info-value">@Model.ShippingAddress</span>
+                    </div>
+                    @if (!string.IsNullOrEmpty(Model.UserFullName))
+                    {
+                        <div class="info-row">
+                            <span class="info-label"><i class="bi bi-person me-1"></i>Người đặt</span>
+                            <span class="info-value">@Model.UserFullName (@Model.UserEmail)</span>
+                        </div>
+                    }
+                </div>
+
+                <!-- Order Items -->
+                <div class="detail-card">
+                    <div class="detail-title">
+                        <i class="bi bi-bag"></i> Sản phẩm đặt hàng
+                    </div>
+
+                    <table class="items-table">
+                        <thead>
+                            <tr>
+                                <th>Sách</th>
+                                <th style="text-align:center">Số lượng</th>
+                                <th style="text-align:right">Đơn giá</th>
+                                <th style="text-align:right">Thành tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.OrderDetails)
+                            {
+                                <tr>
+                                    <td>
+                                        <div style="display:flex;align-items:center;">
+                                            @if (!string.IsNullOrEmpty(item.BookImageUrl))
+                                            {
+                                                <img src="@item.BookImageUrl" class="book-img-thumb"
+                                                     onerror="this.style.display='none'" alt="@item.BookTitle" />
+                                            }
+                                            <div>
+                                                <div style="font-weight:600;">@item.BookTitle</div>
+                                                @if (!string.IsNullOrEmpty(item.BookAuthor))
+                                                {
+                                                    <div style="font-size:0.8rem;color:var(--text-muted);">@item.BookAuthor</div>
+                                                }
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td style="text-align:center;color:var(--primary);font-weight:600;">@item.Quantity</td>
+                                    <td style="text-align:right;">@item.UnitPrice.ToString("N0")₫</td>
+                                    <td style="text-align:right;font-weight:600;color:var(--primary);">@item.SubTotal.ToString("N0")₫</td>
+                                </tr>
+                            }
+                            <tr class="total-row">
+                                <td colspan="3" style="text-align:right;color:var(--text-muted);font-weight:600;">Tổng cộng:</td>
+                                <td style="text-align:right;">@Model.TotalAmount.ToString("N0")₫</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>

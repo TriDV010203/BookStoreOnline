@@ -1,0 +1,252 @@
+@model BookStoreOnline.MVC.Models.OrderViewModel
+@{
+    ViewData["Title"] = $"Chi tiết đơn hàng #{Model.Id}";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
+    string BadgeClass(string s) => s switch
+    {
+        "Pending"    => "badge-warning",
+        "Processing" => "badge-info",
+        "Shipped"    => "badge-primary",
+        "Delivered"  => "badge-success",
+        "Cancelled"  => "badge-danger",
+        _            => "badge-secondary"
+    };
+
+    string StatusLabel(string s) => s switch
+    {
+        "Pending"    => "⏳ Chờ xác nhận",
+        "Processing" => "📦 Đang chuẩn bị hàng",
+        "Shipped"    => "🚚 Đang giao",
+        "Delivered"  => "✅ Đã giao thành công",
+        "Cancelled"  => "❌ Đã hủy",
+        _ => s
+    };
+
+    // Define status flow
+    var allStatuses = new[] { "Pending", "Processing", "Shipped", "Delivered", "Cancelled" };
+}
+
+<style>
+    .badge-warning   { background: rgba(251,191,36,0.15); color: #fbbf24; border: 1px solid rgba(251,191,36,0.3); }
+    .badge-info      { background: rgba(99,102,241,0.15); color: #818cf8; border: 1px solid rgba(99,102,241,0.3); }
+    .badge-primary   { background: rgba(6,182,212,0.15); color: #22d3ee; border: 1px solid rgba(6,182,212,0.3); }
+    .badge-success   { background: rgba(74,222,128,0.15); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
+    .badge-danger    { background: rgba(248,113,113,0.15); color: #f87171; border: 1px solid rgba(248,113,113,0.3); }
+    .badge-secondary { background: rgba(148,163,184,0.15); color: #94a3b8; border: 1px solid rgba(148,163,184,0.3); }
+
+    .status-badge-lg {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.45rem 1.1rem;
+        border-radius: 20px;
+        font-size: 0.88rem;
+        font-weight: 700;
+    }
+
+    .order-info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .info-block {
+        background: rgba(255,255,255,0.03);
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        padding: 1rem;
+    }
+
+    .info-block-label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.3rem;
+    }
+
+    .info-block-value {
+        font-size: 0.95rem;
+        color: var(--text-light);
+        font-weight: 500;
+    }
+
+    .status-flow {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 1.5rem;
+        padding-top: 1.25rem;
+        border-top: 1px solid var(--border-color);
+        align-items: center;
+    }
+
+    .status-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.45rem 1rem;
+        border-radius: 8px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+        background: rgba(255,255,255,0.07);
+        color: var(--text-light);
+    }
+
+    .status-btn:hover { background: rgba(201,168,76,0.2); color: var(--primary); }
+    .status-btn.current { background: var(--primary); color: #0a0a0f; cursor: default; }
+    .status-btn.cancel-btn { background: rgba(248,113,113,0.12); color: #f87171; }
+    .status-btn.cancel-btn:hover { background: rgba(248,113,113,0.25); }
+
+    .items-table { width: 100%; border-collapse: collapse; }
+    .items-table th {
+        text-align: left;
+        padding: 0.75rem 0.75rem;
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        border-bottom: 1px solid var(--border-color);
+    }
+    .items-table td {
+        padding: 0.85rem 0.75rem;
+        border-bottom: 1px solid rgba(255,255,255,0.04);
+        color: var(--text-light);
+        vertical-align: middle;
+        font-size: 0.9rem;
+    }
+    .book-img-thumb {
+        width: 38px; height: 52px;
+        object-fit: cover; border-radius: 5px; margin-right: 0.6rem;
+    }
+</style>
+
+<div class="page-header">
+    <div>
+        <div class="page-header-title">📄 Chi tiết Đơn hàng #@Model.Id</div>
+        <div class="page-header-sub">
+            <span class="status-badge-lg @BadgeClass(Model.OrderStatus)">@StatusLabel(Model.OrderStatus)</span>
+        </div>
+    </div>
+    <a asp-controller="Admin" asp-action="Orders" class="btn-admin-secondary">
+        <i class="bi bi-arrow-left"></i> Quay lại
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+
+        <!-- Order Items -->
+        <div class="admin-card">
+            <div class="admin-card-title"><i class="bi bi-bag"></i> Sản phẩm</div>
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th>Sách</th>
+                        <th style="text-align:center">SL</th>
+                        <th style="text-align:right">Đơn giá</th>
+                        <th style="text-align:right">Thành tiền</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.OrderDetails)
+                    {
+                        <tr>
+                            <td>
+                                <div style="display:flex;align-items:center;">
+                                    @if (!string.IsNullOrEmpty(item.BookImageUrl))
+                                    {
+                                        <img src="@item.BookImageUrl" class="book-img-thumb"
+                                             onerror="this.style.display='none'" alt="@item.BookTitle" />
+                                    }
+                                    <div>
+                                        <div style="font-weight:600;">@item.BookTitle</div>
+                                        @if (!string.IsNullOrEmpty(item.BookAuthor))
+                                        {
+                                            <div style="font-size:0.78rem;color:var(--text-muted);">@item.BookAuthor</div>
+                                        }
+                                    </div>
+                                </div>
+                            </td>
+                            <td style="text-align:center;font-weight:700;color:var(--primary);">@item.Quantity</td>
+                            <td style="text-align:right;">@item.UnitPrice.ToString("N0")₫</td>
+                            <td style="text-align:right;font-weight:700;color:var(--primary);">@item.SubTotal.ToString("N0")₫</td>
+                        </tr>
+                    }
+                    <tr>
+                        <td colspan="3" style="text-align:right;font-weight:700;color:var(--text-muted);padding-top:1rem;border-bottom:none;">Tổng cộng:</td>
+                        <td style="text-align:right;font-size:1.1rem;font-weight:700;color:var(--primary);padding-top:1rem;border-bottom:none;">@Model.TotalAmount.ToString("N0")₫</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <div class="col-md-4">
+
+        <!-- Order Info -->
+        <div class="admin-card">
+            <div class="admin-card-title"><i class="bi bi-info-circle"></i> Thông tin đơn hàng</div>
+
+            <div class="order-info-grid">
+                <div class="info-block">
+                    <div class="info-block-label">Mã đơn</div>
+                    <div class="info-block-value" style="color:var(--primary);font-weight:700;">#@Model.Id</div>
+                </div>
+                <div class="info-block">
+                    <div class="info-block-label">Ngày đặt</div>
+                    <div class="info-block-value">@Model.OrderDate.ToString("dd/MM/yyyy")</div>
+                </div>
+            </div>
+
+            <div class="info-block" style="margin-bottom:1rem;">
+                <div class="info-block-label">Người mua</div>
+                <div class="info-block-value">@(Model.UserFullName ?? "—")</div>
+                <div style="font-size:0.8rem;color:var(--text-muted);">@Model.UserEmail</div>
+            </div>
+
+            <div class="info-block">
+                <div class="info-block-label">Địa chỉ giao hàng</div>
+                <div class="info-block-value">@Model.ShippingAddress</div>
+            </div>
+
+            <!-- Status Change -->
+            @if (Model.OrderStatus != "Delivered")
+            {
+                <div class="status-flow">
+                    <span style="font-size:0.8rem;color:var(--text-muted);font-weight:600;width:100%;">Cập nhật trạng thái:</span>
+                    @foreach (var s in allStatuses)
+                    {
+                        if (s == "Cancelled") continue; // Hiển thị riêng ở cuối
+                        <form method="post" asp-controller="Admin" asp-action="UpdateOrderStatus" asp-route-id="@Model.Id" style="display:inline;">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="status" value="@s" />
+                            <button type="submit"
+                                    class="status-btn @(Model.OrderStatus == s ? "current" : "")"
+                                    @(Model.OrderStatus == s ? "disabled" : "")>
+                                @StatusLabel(s)
+                            </button>
+                        </form>
+                    }
+                    @if (Model.OrderStatus != "Cancelled")
+                    {
+                        <form method="post" asp-controller="Admin" asp-action="UpdateOrderStatus" asp-route-id="@Model.Id" style="display:inline;"
+                              onsubmit="return confirm('Xác nhận hủy đơn hàng này? Tồn kho sẽ được hoàn trả.')">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="status" value="Cancelled" />
+                            <button type="submit" class="status-btn cancel-btn">❌ Hủy đơn</button>
+                        </form>
+                    }
+                </div>
+            }
+        </div>
+
+    </div>
+</div>

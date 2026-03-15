@@ -1,0 +1,412 @@
+@model BookStoreOnline.MVC.Models.BookViewModel
+@{
+    ViewData["Title"] = Model.Title;
+    var isLoggedIn = Context.Session.GetString("UserEmail") != null;
+    var returnUrl = $"/Home/Detail/{Model.Id}";
+}
+
+@section Styles {
+<style>
+    /* ── Detail Page ── */
+    .detail-section {
+        padding: 3rem 0 4rem;
+        min-height: calc(100vh - 120px);
+    }
+
+    .detail-breadcrumb {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+
+    .detail-breadcrumb a {
+        color: var(--primary);
+        text-decoration: none;
+    }
+
+    .detail-breadcrumb a:hover { text-decoration: underline; }
+
+    /* Book cover */
+    .detail-cover-wrapper {
+        position: relative;
+        background: var(--surface);
+        border-radius: 20px;
+        overflow: hidden;
+        padding: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 380px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    }
+
+    .detail-cover-wrapper img {
+        max-height: 360px;
+        max-width: 100%;
+        object-fit: contain;
+        border-radius: 10px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    .detail-placeholder {
+        font-size: 6rem;
+        opacity: 0.5;
+    }
+
+    .detail-category-badge {
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+        background: var(--primary);
+        color: #fff;
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 0.3rem 0.75rem;
+        border-radius: 20px;
+        letter-spacing: 0.03em;
+    }
+
+    /* Info panel */
+    .detail-info {
+        padding: 0.5rem 0 0 1rem;
+    }
+
+    .detail-title {
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: var(--text-light);
+        line-height: 1.25;
+        margin-bottom: 0.5rem;
+    }
+
+    .detail-author {
+        color: var(--text-muted);
+        font-size: 0.95rem;
+        margin-bottom: 1rem;
+    }
+
+    .detail-author span {
+        color: var(--primary);
+        font-weight: 600;
+    }
+
+    .detail-price {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--primary);
+        margin-bottom: 0.75rem;
+    }
+
+    .detail-stock {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        padding: 0.3rem 0.9rem;
+        border-radius: 30px;
+        margin-bottom: 1.25rem;
+    }
+
+    .detail-stock.in { background: rgba(74,222,128,0.12); color: #4ade80; }
+    .detail-stock.out { background: rgba(248,113,113,0.12); color: #f87171; }
+
+    .detail-desc {
+        color: var(--text-muted);
+        font-size: 0.92rem;
+        line-height: 1.7;
+        margin-bottom: 1.5rem;
+        padding: 1rem;
+        background: var(--surface);
+        border-radius: 12px;
+        border-left: 3px solid var(--primary);
+    }
+
+    /* Qty selector */
+    .qty-row {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .qty-label {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        min-width: 70px;
+    }
+
+    .qty-control {
+        display: flex;
+        align-items: center;
+        border: 1.5px solid var(--border-color);
+        border-radius: 12px;
+        overflow: hidden;
+        background: var(--surface);
+    }
+
+    .qty-btn {
+        background: transparent;
+        border: none;
+        color: var(--text-light);
+        width: 38px;
+        height: 38px;
+        font-size: 1.1rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.15s;
+    }
+
+    .qty-btn:hover:not(:disabled) { background: rgba(139,92,246,0.15); color: var(--primary); }
+    .qty-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    .qty-input {
+        width: 52px;
+        text-align: center;
+        border: none;
+        background: transparent;
+        color: var(--text-light);
+        font-size: 1rem;
+        font-weight: 700;
+        outline: none;
+        -moz-appearance: textfield;
+    }
+
+    .qty-input::-webkit-outer-spin-button,
+    .qty-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+    .qty-max-hint {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+    }
+
+    /* Action buttons */
+    .btn-add-to-cart-detail {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        background: linear-gradient(135deg, var(--primary), #6d28d9);
+        color: #fff;
+        border: none;
+        padding: 0.85rem 2rem;
+        border-radius: 14px;
+        font-weight: 700;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.25s;
+        width: 100%;
+        box-shadow: 0 4px 16px rgba(139,92,246,0.35);
+    }
+
+    .btn-add-to-cart-detail:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 24px rgba(139,92,246,0.5);
+    }
+
+    .btn-add-to-cart-detail:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .btn-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        text-decoration: none;
+        transition: color 0.2s;
+        margin-top: 0.75rem;
+    }
+
+    .btn-back:hover { color: var(--primary); }
+
+    .login-cta {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+        padding: 1rem;
+        background: var(--surface);
+        border-radius: 14px;
+        border: 1.5px dashed var(--border-color);
+    }
+
+    .btn-login-to-buy {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: linear-gradient(135deg, var(--primary), #6d28d9);
+        color: #fff;
+        padding: 0.75rem 1.5rem;
+        border-radius: 12px;
+        font-weight: 700;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+    .btn-login-to-buy:hover {
+        transform: translateY(-1px);
+        color: #fff;
+    }
+
+    @@media (max-width: 767px) {
+        .detail-info { padding: 1.5rem 0 0; }
+        .detail-title { font-size: 1.4rem; }
+        .detail-price { font-size: 1.6rem; }
+    }
+</style>
+}
+
+<section class="detail-section">
+    <div class="container">
+        <!-- Breadcrumb -->
+        <nav class="detail-breadcrumb">
+            <a asp-controller="Home" asp-action="Index"><i class="bi bi-house"></i> Trang chủ</a>
+            <i class="bi bi-chevron-right" style="font-size:0.7rem;"></i>
+            <span>@Model.Title</span>
+        </nav>
+
+        <div class="row g-4 g-md-5">
+            <!-- Left: Book Cover -->
+            <div class="col-12 col-md-5">
+                <div class="detail-cover-wrapper">
+                    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                    {
+                        <img src="@Model.ImageUrl" alt="@Model.Title" />
+                    }
+                    else
+                    {
+                        <div class="detail-placeholder">📖</div>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.CategoryName))
+                    {
+                        <span class="detail-category-badge">@Model.CategoryName</span>
+                    }
+                </div>
+            </div>
+
+            <!-- Right: Book Info -->
+            <div class="col-12 col-md-7">
+                <div class="detail-info">
+                    <h1 class="detail-title">@Model.Title</h1>
+                    <p class="detail-author">bởi <span>@Model.Author</span></p>
+
+                    <div class="detail-price">@Model.Price.ToString("N0")₫</div>
+
+                    <span class="detail-stock @(Model.StockQuantity > 0 ? "in" : "out")">
+                        @if (Model.StockQuantity > 0)
+                        {
+                            <i class="bi bi-check-circle-fill"></i> <span>Còn hàng (@Model.StockQuantity cuốn)</span>
+                        }
+                        else
+                        {
+                            <i class="bi bi-x-circle-fill"></i> <span>Hết hàng</span>
+                        }
+                    </span>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.Description))
+                    {
+                        <p class="detail-desc">@Model.Description</p>
+                    }
+
+                    @if (isLoggedIn)
+                    {
+                        @if (Model.StockQuantity > 0)
+                        {
+                            <form id="addCartForm" method="post" asp-controller="Cart" asp-action="Add">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="bookId" value="@Model.Id" />
+                                <input type="hidden" name="returnUrl" value="@returnUrl" />
+
+                                <!-- Qty selector -->
+                                <div class="qty-row">
+                                    <span class="qty-label">Số lượng:</span>
+                                    <div class="qty-control">
+                                        <button type="button" class="qty-btn" id="btnMinus" onclick="changeQty(-1)">
+                                            <i class="bi bi-dash"></i>
+                                        </button>
+                                        <input type="number" name="quantity" id="qtyInput"
+                                               class="qty-input" value="1" min="1" max="@Model.StockQuantity" />
+                                        <button type="button" class="qty-btn" id="btnPlus" onclick="changeQty(1)">
+                                            <i class="bi bi-plus"></i>
+                                        </button>
+                                    </div>
+                                    <span class="qty-max-hint">Tối đa @Model.StockQuantity cuốn</span>
+                                </div>
+
+                                <button type="submit" class="btn-add-to-cart-detail">
+                                    <i class="bi bi-cart-plus" style="font-size:1.2rem;"></i>
+                                    Thêm vào giỏ hàng
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <button class="btn-add-to-cart-detail" disabled>
+                                <i class="bi bi-x-circle"></i> Hết hàng
+                            </button>
+                        }
+                    }
+                    else
+                    {
+                        <div class="login-cta">
+                            <span style="color: var(--text-muted); font-size: 0.9rem;">
+                                <i class="bi bi-info-circle me-1"></i>Vui lòng đăng nhập để thêm vào giỏ hàng
+                            </span>
+                            <a asp-controller="Account" asp-action="Login"
+                               asp-route-returnUrl="@returnUrl"
+                               class="btn-login-to-buy">
+                                <i class="bi bi-box-arrow-in-right"></i> Đăng nhập để mua
+                            </a>
+                        </div>
+                    }
+
+                    <a asp-controller="Home" asp-action="Index" class="btn-back">
+                        <i class="bi bi-arrow-left"></i> Quay lại danh sách sách
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+<script>
+    var maxQty = @Model.StockQuantity;
+
+    function changeQty(delta) {
+        var input = document.getElementById('qtyInput');
+        var current = parseInt(input.value) || 1;
+        var next = current + delta;
+        if (next < 1) next = 1;
+        if (next > maxQty) next = maxQty;
+        input.value = next;
+        updateBtns(next);
+    }
+
+    function updateBtns(val) {
+        document.getElementById('btnMinus').disabled = val <= 1;
+        document.getElementById('btnPlus').disabled = val >= maxQty;
+    }
+
+    document.getElementById('qtyInput')?.addEventListener('change', function () {
+        var v = parseInt(this.value) || 1;
+        if (v < 1) v = 1;
+        if (v > maxQty) v = maxQty;
+        this.value = v;
+        updateBtns(v);
+    });
+
+    // Init buttons state
+    updateBtns(1);
+</script>
+}

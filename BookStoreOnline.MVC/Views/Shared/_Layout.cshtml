@@ -40,6 +40,13 @@
                     @if (Context.Session.GetString("UserEmail") != null)
                     {
                         <!-- Đã đăng nhập -->
+                        <!-- Giỏ hàng icon -->
+                        <a asp-controller="Cart" asp-action="Index"
+                           class="nav-link position-relative cart-icon-btn"
+                           title="Giỏ hàng" style="font-size: 1.3rem; color: var(--text-muted); padding: 0.25rem 0.5rem; transition: color 0.2s;">
+                            <i class="bi bi-cart3"></i>
+                        </a>
+
                         <div class="dropdown user-dropdown">
                             <button class="btn btn-link nav-link d-flex align-items-center gap-2 text-decoration-none"
                                     data-bs-toggle="dropdown" aria-expanded="false">
@@ -56,6 +63,11 @@
                                     <span class="dropdown-item-text text-muted" style="font-size: 0.78rem; padding: 0.5rem 1rem;">
                                         <i class="bi bi-person-circle me-1"></i>@Context.Session.GetString("UserRole")
                                     </span>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" asp-controller="Account" asp-action="Profile">
+                                        <i class="bi bi-person-lines-fill me-2" style="color: var(--primary);"></i>Hồ sơ cá nhân
+                                    </a>
                                 </li>
                                 @if (Context.Session.GetString("UserRole") == "Admin")
                                 {
@@ -112,6 +124,12 @@
                                 @Context.Session.GetString("UserFullName")
                             </span>
                         </div>
+                        <a asp-controller="Cart" asp-action="Index" class="nav-link d-block mb-1">
+                            <i class="bi bi-cart3 me-2" style="color: var(--primary);"></i>Giỏ hàng
+                        </a>
+                        <a asp-controller="Account" asp-action="Profile" class="nav-link d-block mb-1">
+                            <i class="bi bi-person-lines-fill me-2" style="color: var(--primary);"></i>Hồ sơ cá nhân
+                        </a>
                         @if (Context.Session.GetString("UserRole") == "Admin")
                         {
                             <a asp-controller="Admin" asp-action="Index" class="nav-link d-block mb-1">

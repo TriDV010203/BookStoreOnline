@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace BookStoreOnline.API.Models
 {
@@ -23,5 +23,7 @@ namespace BookStoreOnline.API.Models
         public string Role { get; set; } = "Customer"; // Mặc định là Customer, Admin sẽ set tay
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
+
+        public bool IsBanned { get; set; } = false;
     }
 }

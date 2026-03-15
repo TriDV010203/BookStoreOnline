@@ -19,7 +19,7 @@ namespace BookStoreOnline.API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
-            return await _context.Users.ToListAsync();
+            return await _context.Users.OrderByDescending(u => u.CreatedAt).ToListAsync();
         }
 
         // 2. Lấy thông tin 1 user theo ID
@@ -46,7 +46,7 @@ namespace BookStoreOnline.API.Controllers
             return CreatedAtAction("GetUser", new { id = user.Id }, user);
         }
 
-        // 4. Đăng nhập
+        // 4. Đăng nhập — kiểm tra cả IsBanned
         [HttpPost("login")]
         public async Task<ActionResult<User>> Login([FromBody] LoginRequest request)
         {
@@ -56,6 +56,11 @@ namespace BookStoreOnline.API.Controllers
             if (user == null)
             {
                 return Unauthorized("Email hoặc mật khẩu không chính xác!");
+            }
+
+            if (user.IsBanned)
+            {
+                return Unauthorized("Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên.");
             }
 
             return Ok(user);
@@ -68,7 +73,6 @@ namespace BookStoreOnline.API.Controllers
             var user = await _context.Users.FindAsync(id);
             if (user == null) return NotFound("Không tìm thấy người dùng.");
 
-            // Kiểm tra email mới có bị trùng không (trừ chính user này)
             if (user.Email != request.Email &&
                 await _context.Users.AnyAsync(u => u.Email == request.Email && u.Id != id))
             {
@@ -98,6 +102,31 @@ namespace BookStoreOnline.API.Controllers
             await _context.SaveChangesAsync();
 
             return Ok("Đổi mật khẩu thành công!");
+        }
+
+        // 7. Khóa tài khoản (Ban)
+        [HttpPatch("{id}/ban")]
+        public async Task<IActionResult> BanUser(int id)
+        {
+            var user = await _context.Users.FindAsync(id);
+            if (user == null) return NotFound("Không tìm thấy người dùng.");
+            if (user.Role == "Admin") return BadRequest("Không thể khóa tài khoản Admin.");
+
+            user.IsBanned = true;
+            await _context.SaveChangesAsync();
+            return Ok("Đã khóa tài khoản.");
+        }
+
+        // 8. Mở khóa tài khoản (Unban)
+        [HttpPatch("{id}/unban")]
+        public async Task<IActionResult> UnbanUser(int id)
+        {
+            var user = await _context.Users.FindAsync(id);
+            if (user == null) return NotFound("Không tìm thấy người dùng.");
+
+            user.IsBanned = false;
+            await _context.SaveChangesAsync();
+            return Ok("Đã mở khóa tài khoản.");
         }
     }
 

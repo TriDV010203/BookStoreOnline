@@ -128,7 +128,6 @@ namespace BookStoreOnline.MVC.Controllers
 
             if (success)
             {
-                // Cập nhật lại session
                 HttpContext.Session.SetString("UserFullName", model.FullName);
                 HttpContext.Session.SetString("UserEmail", model.Email);
                 TempData["SuccessMessage"] = message;
@@ -178,6 +177,52 @@ namespace BookStoreOnline.MVC.Controllers
 
             ModelState.AddModelError(string.Empty, message);
             return View(model);
+        }
+
+        // ── MY ORDERS ─────────────────────────────────────────────────────────
+
+        // GET: /Account/MyOrders
+        [HttpGet]
+        public async Task<IActionResult> MyOrders()
+        {
+            if (HttpContext.Session.GetString("UserEmail") == null)
+                return RedirectToAction("Login", new { returnUrl = "/Account/MyOrders" });
+
+            var userIdStr = HttpContext.Session.GetString("UserId");
+            if (!int.TryParse(userIdStr, out int userId))
+                return RedirectToAction("Login");
+
+            var orders = await _apiService.GetOrdersByUserAsync(userId);
+            return View(orders);
+        }
+
+        // GET: /Account/OrderDetail/{id}
+        [HttpGet]
+        public async Task<IActionResult> OrderDetail(int id)
+        {
+            if (HttpContext.Session.GetString("UserEmail") == null)
+                return RedirectToAction("Login");
+
+            var userIdStr = HttpContext.Session.GetString("UserId");
+            if (!int.TryParse(userIdStr, out int userId))
+                return RedirectToAction("Login");
+
+            var order = await _apiService.GetOrderDetailAsync(id);
+            if (order == null)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy đơn hàng.";
+                return RedirectToAction("MyOrders");
+            }
+
+            // Bảo mật: Customer chỉ xem được đơn hàng của chính mình
+            var role = HttpContext.Session.GetString("UserRole") ?? "";
+            if (role != "Admin" && order.UserId != userId)
+            {
+                TempData["ErrorMessage"] = "Bạn không có quyền xem đơn hàng này.";
+                return RedirectToAction("MyOrders");
+            }
+
+            return View(order);
         }
     }
 }

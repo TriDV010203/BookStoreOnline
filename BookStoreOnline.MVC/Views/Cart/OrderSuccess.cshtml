@@ -1,0 +1,32 @@
+@{
+    ViewData["Title"] = "Đặt hàng thành công";
+}
+
+<section style="padding: 5rem 0; text-align: center;">
+    <div class="container">
+        <div style="font-size: 5rem; margin-bottom: 1rem; animation: bounceIn 0.6s ease;">🎉</div>
+        <h1 style="font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700; color: var(--text-light); margin-bottom: 0.5rem;">
+            Đặt hàng thành công!
+        </h1>
+        <p style="color: var(--text-muted); font-size: 1rem; margin-bottom: 2rem; max-width: 420px; margin-left: auto; margin-right: auto;">
+            Cảm ơn bạn đã đặt hàng. Chúng tôi sẽ liên hệ xác nhận và giao hàng trong thời gian sớm nhất.
+        </p>
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+            <a asp-controller="Home" asp-action="Index"
+               style="display: inline-flex; align-items: center; gap: 0.5rem; background: linear-gradient(135deg, var(--primary), #8a6e2f); color: var(--dark-bg); padding: 0.8rem 2rem; border-radius: 14px; font-weight: 700; text-decoration: none; transition: all 0.25s;"
+               onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                <i class="bi bi-book"></i> Tiếp tục mua sắm
+            </a>
+        </div>
+    </div>
+</section>
+
+@section Styles {
+<style>
+    @@keyframes bounceIn {
+        0%   { transform: scale(0.5); opacity: 0; }
+        70%  { transform: scale(1.1); }
+        100% { transform: scale(1); opacity: 1; }
+    }
+</style>
+}

@@ -1,16 +1,16 @@
 ﻿<Project>
   <ItemGroup>
+    <StaticWebAssetEndpoint Include="_content/BookStoreOnline.MVC/css/site.a3bzk4lsei.css">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\site.css'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"fingerprint","Value":"a3bzk4lsei"},{"Name":"integrity","Value":"sha256-Gmk6nCdhqAzXUZtpwcMC6701wyotIs2IEPXvpbwwEh8="},{"Name":"label","Value":"_content/BookStoreOnline.MVC/css/site.css"}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"22114"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022Gmk6nCdhqAzXUZtpwcMC6701wyotIs2IEPXvpbwwEh8=\u0022"},{"Name":"Last-Modified","Value":"Sat, 14 Mar 2026 14:30:52 GMT"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
     <StaticWebAssetEndpoint Include="_content/BookStoreOnline.MVC/css/site.css">
       <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\site.css'))</AssetFile>
       <Selectors><![CDATA[[]]]></Selectors>
-      <EndpointProperties><![CDATA[[{"Name":"integrity","Value":"sha256-xl8X/bayN6JLZAV4igz5UNPdBoQmzExY/FacmhH852I="}]]]></EndpointProperties>
-      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"21461"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022xl8X/bayN6JLZAV4igz5UNPdBoQmzExY/FacmhH852I=\u0022"},{"Name":"Last-Modified","Value":"Wed, 11 Mar 2026 12:54:28 GMT"}]]]></ResponseHeaders>
-    </StaticWebAssetEndpoint>
-    <StaticWebAssetEndpoint Include="_content/BookStoreOnline.MVC/css/site.ixxg8icosa.css">
-      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\site.css'))</AssetFile>
-      <Selectors><![CDATA[[]]]></Selectors>
-      <EndpointProperties><![CDATA[[{"Name":"fingerprint","Value":"ixxg8icosa"},{"Name":"integrity","Value":"sha256-xl8X/bayN6JLZAV4igz5UNPdBoQmzExY/FacmhH852I="},{"Name":"label","Value":"_content/BookStoreOnline.MVC/css/site.css"}]]]></EndpointProperties>
-      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"21461"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022xl8X/bayN6JLZAV4igz5UNPdBoQmzExY/FacmhH852I=\u0022"},{"Name":"Last-Modified","Value":"Wed, 11 Mar 2026 12:54:28 GMT"}]]]></ResponseHeaders>
+      <EndpointProperties><![CDATA[[{"Name":"integrity","Value":"sha256-Gmk6nCdhqAzXUZtpwcMC6701wyotIs2IEPXvpbwwEh8="}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"22114"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022Gmk6nCdhqAzXUZtpwcMC6701wyotIs2IEPXvpbwwEh8=\u0022"},{"Name":"Last-Modified","Value":"Sat, 14 Mar 2026 14:30:52 GMT"}]]]></ResponseHeaders>
     </StaticWebAssetEndpoint>
     <StaticWebAssetEndpoint Include="_content/BookStoreOnline.MVC/favicon.61n19gt1b8.ico">
       <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\favicon.ico'))</AssetFile>
