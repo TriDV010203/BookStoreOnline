@@ -407,6 +407,77 @@ namespace BookStoreOnline.MVC.Services
         }
 
         // =====================================================================
+        // REVIEWS
+        // =====================================================================
+
+        public async Task<List<ReviewViewModel>> GetReviewsByBookAsync(int bookId)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"api/reviews/book/{bookId}");
+                if (response.IsSuccessStatusCode)
+                {
+                    var reviews = await response.Content.ReadFromJsonAsync<List<ReviewViewModel>>(_jsonOptions);
+                    return reviews ?? new();
+                }
+                return new();
+            }
+            catch { return new(); }
+        }
+
+        public async Task<List<ReviewViewModel>> GetAllReviewsAsync()
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync("api/reviews");
+                if (response.IsSuccessStatusCode)
+                {
+                    var reviews = await response.Content.ReadFromJsonAsync<List<ReviewViewModel>>(_jsonOptions);
+                    return reviews ?? new();
+                }
+                return new();
+            }
+            catch { return new(); }
+        }
+
+        public async Task<(bool canReview, bool hasPurchased, bool hasReviewed)> CanReviewAsync(int userId, int bookId)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"api/reviews/can-review?userId={userId}&bookId={bookId}");
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = await response.Content.ReadFromJsonAsync<CanReviewResponse>(_jsonOptions);
+                    if (result != null)
+                        return (result.CanReview, result.HasPurchased, result.HasReviewed);
+                }
+                return (false, false, false);
+            }
+            catch { return (false, false, false); }
+        }
+
+        public async Task<(bool success, string message)> CreateReviewAsync(CreateReviewViewModel model)
+        {
+            try
+            {
+                var payload = new
+                {
+                    userId = model.UserId,
+                    bookId = model.BookId,
+                    rating = model.Rating,
+                    comment = model.Comment
+                };
+                var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
+                var response = await _httpClient.PostAsync("api/reviews", content);
+                if (response.IsSuccessStatusCode)
+                    return (true, "Đánh giá của bạn đã được gửi thành công!");
+                var err = await response.Content.ReadAsStringAsync();
+                return (false, err.Trim('"'));
+            }
+            catch (Exception ex) { return (false, $"Lỗi kết nối: {ex.Message}"); }
+        }
+
+        // =====================================================================
         // HELPERS
         // =====================================================================
 
@@ -470,6 +541,13 @@ namespace BookStoreOnline.MVC.Services
             public string Title { get; set; } = "";
             public string? Author { get; set; }
             public string? ImageUrl { get; set; }
+        }
+
+        private class CanReviewResponse
+        {
+            public bool CanReview { get; set; }
+            public bool HasPurchased { get; set; }
+            public bool HasReviewed { get; set; }
         }
     }
 }

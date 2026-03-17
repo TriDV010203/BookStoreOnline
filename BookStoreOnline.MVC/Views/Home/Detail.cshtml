@@ -1,268 +1,96 @@
-@model BookStoreOnline.MVC.Models.BookViewModel
+@model BookStoreOnline.MVC.Models.BookDetailViewModel
 @{
-    ViewData["Title"] = Model.Title;
+    ViewData["Title"] = Model.Book.Title;
     var isLoggedIn = Context.Session.GetString("UserEmail") != null;
-    var returnUrl = $"/Home/Detail/{Model.Id}";
+    var returnUrl = $"/Home/Detail/{Model.Book.Id}";
+    var successMsg = TempData["ReviewSuccess"]?.ToString();
+    var errorMsg   = TempData["ReviewError"]?.ToString();
 }
 
 @section Styles {
 <style>
     /* ── Detail Page ── */
-    .detail-section {
-        padding: 3rem 0 4rem;
-        min-height: calc(100vh - 120px);
-    }
-
-    .detail-breadcrumb {
-        font-size: 0.85rem;
-        color: var(--text-muted);
-        margin-bottom: 1.5rem;
-        display: flex;
-        align-items: center;
-        gap: 0.4rem;
-    }
-
-    .detail-breadcrumb a {
-        color: var(--primary);
-        text-decoration: none;
-    }
-
+    .detail-section { padding: 3rem 0 4rem; min-height: calc(100vh - 120px); }
+    .detail-breadcrumb { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.4rem; }
+    .detail-breadcrumb a { color: var(--primary); text-decoration: none; }
     .detail-breadcrumb a:hover { text-decoration: underline; }
 
-    /* Book cover */
-    .detail-cover-wrapper {
-        position: relative;
-        background: var(--surface);
-        border-radius: 20px;
-        overflow: hidden;
-        padding: 2rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 380px;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.18);
-    }
+    /* Cover */
+    .detail-cover-wrapper { position: relative; background: var(--surface); border-radius: 20px; overflow: hidden; padding: 2rem; display: flex; align-items: center; justify-content: center; min-height: 380px; box-shadow: 0 8px 32px rgba(0,0,0,0.18); }
+    .detail-cover-wrapper img { max-height: 360px; max-width: 100%; object-fit: contain; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+    .detail-placeholder { font-size: 6rem; opacity: 0.5; }
+    .detail-category-badge { position: absolute; top: 1rem; left: 1rem; background: var(--primary); color: #fff; font-size: 0.75rem; font-weight: 600; padding: 0.3rem 0.75rem; border-radius: 20px; letter-spacing: 0.03em; }
 
-    .detail-cover-wrapper img {
-        max-height: 360px;
-        max-width: 100%;
-        object-fit: contain;
-        border-radius: 10px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-    }
-
-    .detail-placeholder {
-        font-size: 6rem;
-        opacity: 0.5;
-    }
-
-    .detail-category-badge {
-        position: absolute;
-        top: 1rem;
-        left: 1rem;
-        background: var(--primary);
-        color: #fff;
-        font-size: 0.75rem;
-        font-weight: 600;
-        padding: 0.3rem 0.75rem;
-        border-radius: 20px;
-        letter-spacing: 0.03em;
-    }
-
-    /* Info panel */
-    .detail-info {
-        padding: 0.5rem 0 0 1rem;
-    }
-
-    .detail-title {
-        font-size: 1.75rem;
-        font-weight: 800;
-        color: var(--text-light);
-        line-height: 1.25;
-        margin-bottom: 0.5rem;
-    }
-
-    .detail-author {
-        color: var(--text-muted);
-        font-size: 0.95rem;
-        margin-bottom: 1rem;
-    }
-
-    .detail-author span {
-        color: var(--primary);
-        font-weight: 600;
-    }
-
-    .detail-price {
-        font-size: 2rem;
-        font-weight: 800;
-        color: var(--primary);
-        margin-bottom: 0.75rem;
-    }
-
-    .detail-stock {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.4rem;
-        font-size: 0.85rem;
-        font-weight: 600;
-        padding: 0.3rem 0.9rem;
-        border-radius: 30px;
-        margin-bottom: 1.25rem;
-    }
-
+    /* Info */
+    .detail-info { padding: 0.5rem 0 0 1rem; }
+    .detail-title { font-size: 1.75rem; font-weight: 800; color: var(--text-light); line-height: 1.25; margin-bottom: 0.5rem; }
+    .detail-author { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1rem; }
+    .detail-author span { color: var(--primary); font-weight: 600; }
+    .detail-price { font-size: 2rem; font-weight: 800; color: var(--primary); margin-bottom: 0.75rem; }
+    .detail-stock { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; font-weight: 600; padding: 0.3rem 0.9rem; border-radius: 30px; margin-bottom: 1.25rem; }
     .detail-stock.in { background: rgba(74,222,128,0.12); color: #4ade80; }
     .detail-stock.out { background: rgba(248,113,113,0.12); color: #f87171; }
+    .detail-desc { color: var(--text-muted); font-size: 0.92rem; line-height: 1.7; margin-bottom: 1.5rem; padding: 1rem; background: var(--surface); border-radius: 12px; border-left: 3px solid var(--primary); }
 
-    .detail-desc {
-        color: var(--text-muted);
-        font-size: 0.92rem;
-        line-height: 1.7;
-        margin-bottom: 1.5rem;
-        padding: 1rem;
-        background: var(--surface);
-        border-radius: 12px;
-        border-left: 3px solid var(--primary);
-    }
-
-    /* Qty selector */
-    .qty-row {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        margin-bottom: 1.25rem;
-    }
-
-    .qty-label {
-        font-size: 0.9rem;
-        font-weight: 600;
-        color: var(--text-muted);
-        min-width: 70px;
-    }
-
-    .qty-control {
-        display: flex;
-        align-items: center;
-        border: 1.5px solid var(--border-color);
-        border-radius: 12px;
-        overflow: hidden;
-        background: var(--surface);
-    }
-
-    .qty-btn {
-        background: transparent;
-        border: none;
-        color: var(--text-light);
-        width: 38px;
-        height: 38px;
-        font-size: 1.1rem;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: background 0.15s;
-    }
-
+    /* Qty */
+    .qty-row { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; }
+    .qty-label { font-size: 0.9rem; font-weight: 600; color: var(--text-muted); min-width: 70px; }
+    .qty-control { display: flex; align-items: center; border: 1.5px solid var(--border-color); border-radius: 12px; overflow: hidden; background: var(--surface); }
+    .qty-btn { background: transparent; border: none; color: var(--text-light); width: 38px; height: 38px; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
     .qty-btn:hover:not(:disabled) { background: rgba(139,92,246,0.15); color: var(--primary); }
     .qty-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .qty-input { width: 52px; text-align: center; border: none; background: transparent; color: var(--text-light); font-size: 1rem; font-weight: 700; outline: none; -moz-appearance: textfield; }
+    .qty-input::-webkit-outer-spin-button, .qty-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+    .qty-max-hint { font-size: 0.78rem; color: var(--text-muted); }
 
-    .qty-input {
-        width: 52px;
-        text-align: center;
-        border: none;
-        background: transparent;
-        color: var(--text-light);
-        font-size: 1rem;
-        font-weight: 700;
-        outline: none;
-        -moz-appearance: textfield;
-    }
-
-    .qty-input::-webkit-outer-spin-button,
-    .qty-input::-webkit-inner-spin-button { -webkit-appearance: none; }
-
-    .qty-max-hint {
-        font-size: 0.78rem;
-        color: var(--text-muted);
-    }
-
-    /* Action buttons */
-    .btn-add-to-cart-detail {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-        background: linear-gradient(135deg, var(--primary), #6d28d9);
-        color: #fff;
-        border: none;
-        padding: 0.85rem 2rem;
-        border-radius: 14px;
-        font-weight: 700;
-        font-size: 1rem;
-        cursor: pointer;
-        transition: all 0.25s;
-        width: 100%;
-        box-shadow: 0 4px 16px rgba(139,92,246,0.35);
-    }
-
-    .btn-add-to-cart-detail:hover:not(:disabled) {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 24px rgba(139,92,246,0.5);
-    }
-
-    .btn-add-to-cart-detail:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-        transform: none;
-    }
-
-    .btn-back {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.4rem;
-        color: var(--text-muted);
-        font-size: 0.9rem;
-        text-decoration: none;
-        transition: color 0.2s;
-        margin-top: 0.75rem;
-    }
-
+    /* Cart buttons */
+    .btn-add-to-cart-detail { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; background: linear-gradient(135deg, var(--primary), #6d28d9); color: #fff; border: none; padding: 0.85rem 2rem; border-radius: 14px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.25s; width: 100%; box-shadow: 0 4px 16px rgba(139,92,246,0.35); }
+    .btn-add-to-cart-detail:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(139,92,246,0.5); }
+    .btn-add-to-cart-detail:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .btn-back { display: inline-flex; align-items: center; gap: 0.4rem; color: var(--text-muted); font-size: 0.9rem; text-decoration: none; transition: color 0.2s; margin-top: 0.75rem; }
     .btn-back:hover { color: var(--primary); }
+    .login-cta { display: flex; flex-direction: column; align-items: flex-start; gap: 0.5rem; padding: 1rem; background: var(--surface); border-radius: 14px; border: 1.5px dashed var(--border-color); }
+    .btn-login-to-buy { display: inline-flex; align-items: center; gap: 0.5rem; background: linear-gradient(135deg, var(--primary), #6d28d9); color: #fff; padding: 0.75rem 1.5rem; border-radius: 12px; font-weight: 700; text-decoration: none; transition: all 0.2s; }
+    .btn-login-to-buy:hover { transform: translateY(-1px); color: #fff; }
 
-    .login-cta {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.5rem;
-        padding: 1rem;
-        background: var(--surface);
-        border-radius: 14px;
-        border: 1.5px dashed var(--border-color);
-    }
+    /* ── Rating summary ── */
+    .rating-summary { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; }
+    .rating-avg { font-size: 2.2rem; font-weight: 800; color: #f59e0b; line-height: 1; }
+    .rating-stars-static { color: #f59e0b; font-size: 1.1rem; }
+    .rating-count { font-size: 0.85rem; color: var(--text-muted); }
 
-    .btn-login-to-buy {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        background: linear-gradient(135deg, var(--primary), #6d28d9);
-        color: #fff;
-        padding: 0.75rem 1.5rem;
-        border-radius: 12px;
-        font-weight: 700;
-        text-decoration: none;
-        transition: all 0.2s;
-    }
+    /* ── Reviews section ── */
+    .reviews-section { margin-top: 3rem; }
+    .reviews-section-title { font-size: 1.3rem; font-weight: 700; color: var(--text-light); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; }
+    .review-card { background: var(--surface); border-radius: 16px; padding: 1.25rem 1.5rem; margin-bottom: 1rem; border: 1px solid var(--border-color); display: flex; gap: 1rem; }
+    .review-avatar { width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), #6d28d9); display: flex; align-items: center; justify-content: center; font-weight: 700; color: #fff; font-size: 1rem; flex-shrink: 0; }
+    .review-content { flex: 1; }
+    .review-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.25rem; flex-wrap: wrap; }
+    .review-username { font-weight: 700; color: var(--text-light); font-size: 0.95rem; }
+    .review-stars { color: #f59e0b; font-size: 0.9rem; }
+    .review-date { font-size: 0.78rem; color: var(--text-muted); margin-left: auto; }
+    .review-comment { color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; margin-top: 0.25rem; }
+    .no-reviews { text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.92rem; background: var(--surface); border-radius: 16px; border: 1px dashed var(--border-color); }
 
-    .btn-login-to-buy:hover {
-        transform: translateY(-1px);
-        color: #fff;
-    }
+    /* ── Write Review Form ── */
+    .review-form-card { background: var(--surface); border-radius: 18px; padding: 1.75rem; border: 1px solid var(--border-color); margin-bottom: 2rem; }
+    .review-form-title { font-size: 1rem; font-weight: 700; color: var(--text-light); margin-bottom: 1rem; }
+    .star-picker { display: flex; gap: 0.35rem; margin-bottom: 1rem; flex-direction: row-reverse; justify-content: flex-end; }
+    .star-picker input[type="radio"] { display: none; }
+    .star-picker label { font-size: 2rem; color: #4b5563; cursor: pointer; transition: color 0.15s; }
+    .star-picker input[type="radio"]:checked ~ label,
+    .star-picker label:hover,
+    .star-picker label:hover ~ label { color: #f59e0b; }
+    .review-textarea { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: 12px; color: var(--text-light); padding: 0.85rem 1rem; font-size: 0.9rem; resize: vertical; min-height: 100px; outline: none; transition: border-color 0.2s; font-family: inherit; }
+    .review-textarea:focus { border-color: rgba(139,92,246,0.5); }
+    .review-textarea::placeholder { color: var(--text-muted); }
+    .btn-submit-review { background: linear-gradient(135deg, var(--primary), #6d28d9); color: #fff; border: none; padding: 0.75rem 2rem; border-radius: 12px; font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.5rem; }
+    .btn-submit-review:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(139,92,246,0.4); }
+    .alert-review { border-radius: 12px; padding: 0.85rem 1.25rem; font-size: 0.9rem; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem; }
+    .alert-review.success { background: rgba(74,222,128,0.12); color: #4ade80; border: 1px solid rgba(74,222,128,0.25); }
+    .alert-review.error { background: rgba(248,113,113,0.12); color: #f87171; border: 1px solid rgba(248,113,113,0.25); }
 
-    @@media (max-width: 767px) {
-        .detail-info { padding: 1.5rem 0 0; }
-        .detail-title { font-size: 1.4rem; }
-        .detail-price { font-size: 1.6rem; }
-    }
+    @@media (max-width: 767px) { .detail-info { padding: 1.5rem 0 0; } .detail-title { font-size: 1.4rem; } .detail-price { font-size: 1.6rem; } }
 </style>
 }
 
@@ -272,24 +100,24 @@
         <nav class="detail-breadcrumb">
             <a asp-controller="Home" asp-action="Index"><i class="bi bi-house"></i> Trang chủ</a>
             <i class="bi bi-chevron-right" style="font-size:0.7rem;"></i>
-            <span>@Model.Title</span>
+            <span>@Model.Book.Title</span>
         </nav>
 
         <div class="row g-4 g-md-5">
             <!-- Left: Book Cover -->
             <div class="col-12 col-md-5">
                 <div class="detail-cover-wrapper">
-                    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                    @if (!string.IsNullOrEmpty(Model.Book.ImageUrl))
                     {
-                        <img src="@Model.ImageUrl" alt="@Model.Title" />
+                        <img src="@Model.Book.ImageUrl" alt="@Model.Book.Title" />
                     }
                     else
                     {
                         <div class="detail-placeholder">📖</div>
                     }
-                    @if (!string.IsNullOrEmpty(Model.CategoryName))
+                    @if (!string.IsNullOrEmpty(Model.Book.CategoryName))
                     {
-                        <span class="detail-category-badge">@Model.CategoryName</span>
+                        <span class="detail-category-badge">@Model.Book.CategoryName</span>
                     }
                 </div>
             </div>
@@ -297,15 +125,32 @@
             <!-- Right: Book Info -->
             <div class="col-12 col-md-7">
                 <div class="detail-info">
-                    <h1 class="detail-title">@Model.Title</h1>
-                    <p class="detail-author">bởi <span>@Model.Author</span></p>
+                    <h1 class="detail-title">@Model.Book.Title</h1>
+                    <p class="detail-author">bởi <span>@Model.Book.Author</span></p>
 
-                    <div class="detail-price">@Model.Price.ToString("N0")₫</div>
+                    <!-- Rating summary -->
+                    @if (Model.TotalReviews > 0)
+                    {
+                        <div class="rating-summary">
+                            <span class="rating-avg">@Model.AverageRating</span>
+                            <div>
+                                <div class="rating-stars-static">
+                                    @for (int s = 1; s <= 5; s++)
+                                    {
+                                        <i class="bi @(s <= Math.Round(Model.AverageRating) ? "bi-star-fill" : "bi-star")"></i>
+                                    }
+                                </div>
+                                <span class="rating-count">@Model.TotalReviews đánh giá</span>
+                            </div>
+                        </div>
+                    }
 
-                    <span class="detail-stock @(Model.StockQuantity > 0 ? "in" : "out")">
-                        @if (Model.StockQuantity > 0)
+                    <div class="detail-price">@Model.Book.Price.ToString("N0")₫</div>
+
+                    <span class="detail-stock @(Model.Book.StockQuantity > 0 ? "in" : "out")">
+                        @if (Model.Book.StockQuantity > 0)
                         {
-                            <i class="bi bi-check-circle-fill"></i> <span>Còn hàng (@Model.StockQuantity cuốn)</span>
+                            <i class="bi bi-check-circle-fill"></i> <span>Còn hàng (@Model.Book.StockQuantity cuốn)</span>
                         }
                         else
                         {
@@ -313,21 +158,19 @@
                         }
                     </span>
 
-                    @if (!string.IsNullOrWhiteSpace(Model.Description))
+                    @if (!string.IsNullOrWhiteSpace(Model.Book.Description))
                     {
-                        <p class="detail-desc">@Model.Description</p>
+                        <p class="detail-desc">@Model.Book.Description</p>
                     }
 
                     @if (isLoggedIn)
                     {
-                        @if (Model.StockQuantity > 0)
+                        @if (Model.Book.StockQuantity > 0)
                         {
                             <form id="addCartForm" method="post" asp-controller="Cart" asp-action="Add">
                                 @Html.AntiForgeryToken()
-                                <input type="hidden" name="bookId" value="@Model.Id" />
+                                <input type="hidden" name="bookId" value="@Model.Book.Id" />
                                 <input type="hidden" name="returnUrl" value="@returnUrl" />
-
-                                <!-- Qty selector -->
                                 <div class="qty-row">
                                     <span class="qty-label">Số lượng:</span>
                                     <div class="qty-control">
@@ -335,14 +178,13 @@
                                             <i class="bi bi-dash"></i>
                                         </button>
                                         <input type="number" name="quantity" id="qtyInput"
-                                               class="qty-input" value="1" min="1" max="@Model.StockQuantity" />
+                                               class="qty-input" value="1" min="1" max="@Model.Book.StockQuantity" />
                                         <button type="button" class="qty-btn" id="btnPlus" onclick="changeQty(1)">
                                             <i class="bi bi-plus"></i>
                                         </button>
                                     </div>
-                                    <span class="qty-max-hint">Tối đa @Model.StockQuantity cuốn</span>
+                                    <span class="qty-max-hint">Tối đa @Model.Book.StockQuantity cuốn</span>
                                 </div>
-
                                 <button type="submit" class="btn-add-to-cart-detail">
                                     <i class="bi bi-cart-plus" style="font-size:1.2rem;"></i>
                                     Thêm vào giỏ hàng
@@ -376,12 +218,132 @@
                 </div>
             </div>
         </div>
+
+        <!-- =============================================================== -->
+        <!-- REVIEWS SECTION                                                   -->
+        <!-- =============================================================== -->
+        <div class="reviews-section">
+            <h2 class="reviews-section-title">
+                <i class="bi bi-chat-square-text-fill" style="color: var(--primary);"></i>
+                Đánh giá & Bình luận
+                @if (Model.TotalReviews > 0)
+                {
+                    <span style="font-size:0.85rem; color:var(--text-muted); font-weight:400;">(@Model.TotalReviews nhận xét)</span>
+                }
+            </h2>
+
+            <!-- Alerts -->
+            @if (!string.IsNullOrEmpty(successMsg))
+            {
+                <div class="alert-review success"><i class="bi bi-check-circle-fill"></i> @successMsg</div>
+            }
+            @if (!string.IsNullOrEmpty(errorMsg))
+            {
+                <div class="alert-review error"><i class="bi bi-exclamation-circle-fill"></i> @errorMsg</div>
+            }
+
+            <!-- Write review form -->
+            @if (isLoggedIn)
+            {
+                @if (Model.HasReviewed)
+                {
+                    <div class="alert-review success" style="margin-bottom:1.5rem;">
+                        <i class="bi bi-patch-check-fill"></i> Bạn đã đánh giá sản phẩm này rồi. Cảm ơn!
+                    </div>
+                }
+                else if (!Model.HasPurchased)
+                {
+                    <div class="review-form-card" style="border-style: dashed; opacity:0.85;">
+                        <div class="review-form-title" style="color:var(--text-muted);">
+                            <i class="bi bi-lock me-1"></i> Chỉ khách hàng đã mua sản phẩm này mới có thể đánh giá.
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="review-form-card">
+                        <div class="review-form-title">
+                            <i class="bi bi-pencil-square me-1" style="color:var(--primary);"></i>
+                            Viết đánh giá của bạn
+                        </div>
+                        <form method="post" asp-controller="Home" asp-action="Detail" asp-route-id="@Model.Book.Id">
+                            @Html.AntiForgeryToken()
+                            <!-- Star picker -->
+                            <div class="star-picker" id="starPicker">
+                                <input type="radio" id="star5" name="Rating" value="5" required />
+                                <label for="star5" title="5 sao">★</label>
+                                <input type="radio" id="star4" name="Rating" value="4" />
+                                <label for="star4" title="4 sao">★</label>
+                                <input type="radio" id="star3" name="Rating" value="3" />
+                                <label for="star3" title="3 sao">★</label>
+                                <input type="radio" id="star2" name="Rating" value="2" />
+                                <label for="star2" title="2 sao">★</label>
+                                <input type="radio" id="star1" name="Rating" value="1" />
+                                <label for="star1" title="1 sao">★</label>
+                            </div>
+                            <textarea name="Comment" class="review-textarea"
+                                      placeholder="Chia sẻ cảm nhận của bạn về cuốn sách này..." maxlength="1000"></textarea>
+                            <div style="margin-top:0.85rem;">
+                                <button type="submit" class="btn-submit-review">
+                                    <i class="bi bi-send-fill"></i> Gửi đánh giá
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="review-form-card" style="border-style: dashed;">
+                    <span style="color:var(--text-muted); font-size:0.92rem;">
+                        <i class="bi bi-info-circle me-1"></i>
+                        <a asp-controller="Account" asp-action="Login" asp-route-returnUrl="@returnUrl"
+                           style="color:var(--primary); font-weight:600;">Đăng nhập</a>
+                        để xem và gửi đánh giá.
+                    </span>
+                </div>
+            }
+
+            <!-- Review list -->
+            @if (Model.Reviews.Count == 0)
+            {
+                <div class="no-reviews">
+                    <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">💬</div>
+                    Chưa có đánh giá nào cho sản phẩm này. Hãy là người đầu tiên!
+                </div>
+            }
+            else
+            {
+                @foreach (var r in Model.Reviews.OrderByDescending(x => x.CreatedAt))
+                {
+                    <div class="review-card">
+                        <div class="review-avatar">@r.UserName.Substring(0, 1).ToUpper()</div>
+                        <div class="review-content">
+                            <div class="review-header">
+                                <span class="review-username">@r.UserName</span>
+                                <span class="review-stars">
+                                    @for (int s = 1; s <= 5; s++)
+                                    {
+                                        <i class="bi @(s <= r.Rating ? "bi-star-fill" : "bi-star")"></i>
+                                    }
+                                </span>
+                                <span class="review-date">@r.CreatedAt.ToString("dd/MM/yyyy")</span>
+                            </div>
+                            @if (!string.IsNullOrWhiteSpace(r.Comment))
+                            {
+                                <p class="review-comment">@r.Comment</p>
+                            }
+                        </div>
+                    </div>
+                }
+            }
+        </div>
     </div>
 </section>
 
 @section Scripts {
 <script>
-    var maxQty = @Model.StockQuantity;
+    var maxQty = @Model.Book.StockQuantity;
 
     function changeQty(delta) {
         var input = document.getElementById('qtyInput');
@@ -395,7 +357,7 @@
 
     function updateBtns(val) {
         document.getElementById('btnMinus').disabled = val <= 1;
-        document.getElementById('btnPlus').disabled = val >= maxQty;
+        document.getElementById('btnPlus').disabled  = val >= maxQty;
     }
 
     document.getElementById('qtyInput')?.addEventListener('change', function () {
@@ -406,7 +368,6 @@
         updateBtns(v);
     });
 
-    // Init buttons state
     updateBtns(1);
 </script>
 }

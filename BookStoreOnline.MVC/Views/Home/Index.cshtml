@@ -228,6 +228,35 @@
                                     </span>
                                 </div>
 
+                                <!-- Star rating row -->
+                                <div class="book-rating-row">
+                                    @if (book.ReviewCount > 0)
+                                    {
+                                        <span class="book-stars">
+                                            @for (int s = 1; s <= 5; s++)
+                                            {
+                                                if (s <= Math.Floor(book.AverageRating))
+                                                {
+                                                    <i class="bi bi-star-fill"></i>
+                                                }
+                                                else if (s - book.AverageRating < 1 && s - book.AverageRating > 0)
+                                                {
+                                                    <i class="bi bi-star-half"></i>
+                                                }
+                                                else
+                                                {
+                                                    <i class="bi bi-star"></i>
+                                                }
+                                            }
+                                        </span>
+                                        <span class="book-rating-text">@book.AverageRating <span class="book-review-count">(@book.ReviewCount)</span></span>
+                                    }
+                                    else
+                                    {
+                                        <span class="book-rating-text" style="color: var(--text-muted); opacity:0.5;">Chưa có đánh giá</span>
+                                    }
+                                </div>
+
                                 <div class="d-flex gap-2 mt-1">
                                     <a asp-controller="Home" asp-action="Detail" asp-route-id="@book.Id"
                                        class="btn-detail-book" style="flex: 1; text-align: center; text-decoration: none;">
@@ -352,5 +381,11 @@
     }
     .page-btn:hover { border-color: rgba(201,168,76,0.4); color: var(--primary); }
     .page-btn.active { background: var(--primary); color: #0a0a0f; border-color: var(--primary); font-weight: 700; }
+
+    /* Star ratings on book cards */
+    .book-rating-row { display: flex; align-items: center; gap: 0.4rem; margin: 0.35rem 0 0.1rem; font-size: 0.8rem; }
+    .book-stars { color: #f59e0b; font-size: 0.82rem; letter-spacing: 0.02em; }
+    .book-rating-text { color: #f59e0b; font-weight: 600; font-size: 0.8rem; }
+    .book-review-count { color: var(--text-muted); font-weight: 400; }
 </style>
 }

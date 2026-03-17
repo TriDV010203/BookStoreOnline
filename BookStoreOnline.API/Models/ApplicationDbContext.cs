@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace BookStoreOnline.API.Models // Sửa namespace này nếu bạn bỏ file vào thư mục Data
 {
@@ -15,6 +15,7 @@ namespace BookStoreOnline.API.Models // Sửa namespace này nếu bạn bỏ fi
         public DbSet<Book> Books { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderDetail> OrderDetails { get; set; }
+        public DbSet<ProductReview> ProductReviews { get; set; }
 
         // Cấu hình thêm các hành vi của Database (nếu cần)
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -24,6 +25,11 @@ namespace BookStoreOnline.API.Models // Sửa namespace này nếu bạn bỏ fi
             // Đảm bảo Email của User là duy nhất, không được đăng ký trùng
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.Email)
+                .IsUnique();
+
+            // Mỗi user chỉ được đánh giá 1 lần cho mỗi sách
+            modelBuilder.Entity<ProductReview>()
+                .HasIndex(r => new { r.UserId, r.BookId })
                 .IsUnique();
         }
     }

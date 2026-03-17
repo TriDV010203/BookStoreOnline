@@ -37,5 +37,11 @@ namespace BookStoreOnline.MVC.Services
         Task<List<UserAdminViewModel>> GetAllUsersAsync();
         Task<(bool success, string message)> BanUserAsync(int userId);
         Task<(bool success, string message)> UnbanUserAsync(int userId);
+
+        // ===== REVIEWS =====
+        Task<List<ReviewViewModel>> GetReviewsByBookAsync(int bookId);
+        Task<List<ReviewViewModel>> GetAllReviewsAsync();
+        Task<(bool canReview, bool hasPurchased, bool hasReviewed)> CanReviewAsync(int userId, int bookId);
+        Task<(bool success, string message)> CreateReviewAsync(CreateReviewViewModel model);
     }
 }

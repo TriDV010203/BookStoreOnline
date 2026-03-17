@@ -11,5 +11,9 @@ namespace BookStoreOnline.MVC.Models
         public string? ImageUrl { get; set; }
         public int CategoryId { get; set; }
         public string? CategoryName { get; set; }
+
+        // Populated from reviews
+        public double AverageRating { get; set; }
+        public int ReviewCount { get; set; }
     }
 }
