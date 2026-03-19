@@ -272,16 +272,18 @@ namespace BookStoreOnline.MVC.Services
         // ORDERS
         // =====================================================================
 
-        public async Task<(bool success, string message)> PlaceOrderAsync(int userId, string shippingAddress, List<CartItemViewModel> items)
+        public async Task<(bool success, string message, int orderId)> PlaceOrderAsync(int userId, string shippingAddress, List<CartItemViewModel> items, string paymentMethod = "COD")
         {
             try
             {
+                var orderStatus = paymentMethod == "QR" ? "AwaitingPayment" : "Pending";
                 var payload = new
                 {
                     userId,
                     totalAmount = items.Sum(i => i.SubTotal),
                     shippingAddress,
-                    orderStatus = "Pending",
+                    orderStatus,
+                    paymentMethod,
                     orderDetails = items.Select(i => new
                     {
                         bookId = i.BookId,
@@ -292,11 +294,29 @@ namespace BookStoreOnline.MVC.Services
                 var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
                 var response = await _httpClient.PostAsync("api/orders", content);
                 if (response.IsSuccessStatusCode)
-                    return (true, "Đặt hàng thành công! Cảm ơn bạn đã mua hàng.");
+                {
+                    var created = await response.Content.ReadFromJsonAsync<ApiOrderDto>(_jsonOptions);
+                    return (true, "Đặt hàng thành công! Cảm ơn bạn đã mua hàng.", created?.Id ?? 0);
+                }
                 var err = await response.Content.ReadAsStringAsync();
-                return (false, err.Trim('"'));
+                return (false, err.Trim('"'), 0);
             }
-            catch (Exception ex) { return (false, $"Lỗi kết nối: {ex.Message}"); }
+            catch (Exception ex) { return (false, $"Lỗi kết nối: {ex.Message}", 0); }
+        }
+
+        public async Task<(bool isPaid, string status)> GetPaymentStatusAsync(int orderId)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"api/payment/status/{orderId}");
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = await response.Content.ReadFromJsonAsync<PaymentStatusResponse>(_jsonOptions);
+                    if (result != null) return (result.IsPaid, result.Status);
+                }
+                return (false, "Unknown");
+            }
+            catch { return (false, "Unknown"); }
         }
 
         public async Task<List<OrderViewModel>> GetOrdersByUserAsync(int userId)
@@ -357,6 +377,22 @@ namespace BookStoreOnline.MVC.Services
                 return (false, err.Trim('"'));
             }
             catch (Exception ex) { return (false, $"Lỗi kết nối: {ex.Message}"); }
+        }
+
+        public async Task<bool> ExpireOrderAsync(int orderId)
+        {
+            try
+            {
+                var content = new StringContent("{}", Encoding.UTF8, "application/json");
+                var response = await _httpClient.PostAsync($"api/payment/expire/{orderId}", content);
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = await response.Content.ReadFromJsonAsync<ExpireResult>(_jsonOptions);
+                    return result?.Cancelled ?? false;
+                }
+                return false;
+            }
+            catch { return false; }
         }
 
         // =====================================================================
@@ -490,6 +526,7 @@ namespace BookStoreOnline.MVC.Services
                 TotalAmount = dto.TotalAmount,
                 OrderStatus = dto.OrderStatus,
                 ShippingAddress = dto.ShippingAddress,
+                PaymentMethod = dto.PaymentMethod ?? "COD",
                 UserId = dto.UserId,
                 UserFullName = dto.User?.FullName,
                 UserEmail = dto.User?.Email,
@@ -516,7 +553,14 @@ namespace BookStoreOnline.MVC.Services
             public decimal TotalAmount { get; set; }
             public string OrderStatus { get; set; } = "";
             public string ShippingAddress { get; set; } = "";
+            public string? PaymentMethod { get; set; }
             public List<ApiOrderDetailDto>? OrderDetails { get; set; }
+        }
+
+        private class PaymentStatusResponse
+        {
+            public bool IsPaid { get; set; }
+            public string Status { get; set; } = "";
         }
 
         private class ApiOrderDetailDto
@@ -548,6 +592,12 @@ namespace BookStoreOnline.MVC.Services
             public bool CanReview { get; set; }
             public bool HasPurchased { get; set; }
             public bool HasReviewed { get; set; }
+        }
+
+        private class ExpireResult
+        {
+            public bool Cancelled { get; set; }
+            public string Status { get; set; } = "";
         }
     }
 }

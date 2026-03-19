@@ -74,6 +74,8 @@
     .status-shipped   { background: rgba(6,182,212,0.15); color: #22d3ee; border: 1px solid rgba(6,182,212,0.3); }
     .status-delivered { background: rgba(74,222,128,0.15); color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
     .status-cancelled { background: rgba(248,113,113,0.15); color: #f87171; border: 1px solid rgba(248,113,113,0.3); }
+    .status-awaiting  { background: rgba(251,146,60,0.15); color: #fb923c; border: 1px solid rgba(251,146,60,0.3); }
+    .status-paid      { background: rgba(52,211,153,0.15); color: #34d399; border: 1px solid rgba(52,211,153,0.3); }
 
     .order-books {
         display: flex;
@@ -135,6 +137,28 @@
         border-color: var(--primary);
     }
 
+    .btn-pay-qr {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        background: rgba(251,146,60,0.12);
+        color: #fb923c;
+        border: 1px solid rgba(251,146,60,0.35);
+        border-radius: 8px;
+        padding: 0.45rem 1rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s;
+        margin-left: 0.5rem;
+    }
+
+    .btn-pay-qr:hover {
+        background: #fb923c;
+        color: #0a0a0f;
+        border-color: #fb923c;
+    }
+
     .empty-orders {
         text-align: center;
         padding: 4rem 1rem;
@@ -188,21 +212,25 @@
                                 @{
                                     var statusClass = order.OrderStatus switch
                                     {
-                                        "Pending"    => "status-pending",
-                                        "Processing" => "status-processing",
-                                        "Shipped"    => "status-shipped",
-                                        "Delivered"  => "status-delivered",
-                                        "Cancelled"  => "status-cancelled",
-                                        _            => "status-pending"
+                                        "Pending"          => "status-pending",
+                                        "AwaitingPayment"  => "status-awaiting",
+                                        "Paid"             => "status-paid",
+                                        "Processing"       => "status-processing",
+                                        "Shipped"          => "status-shipped",
+                                        "Delivered"        => "status-delivered",
+                                        "Cancelled"        => "status-cancelled",
+                                        _                  => "status-pending"
                                     };
                                     var statusText = order.OrderStatus switch
                                     {
-                                        "Pending"    => "⏳ Chờ xác nhận",
-                                        "Processing" => "📦 Đang chuẩn bị",
-                                        "Shipped"    => "🚚 Đang giao",
-                                        "Delivered"  => "✅ Đã giao",
-                                        "Cancelled"  => "❌ Đã hủy",
-                                        _            => order.OrderStatus
+                                        "Pending"          => "⏳ Chờ xác nhận",
+                                        "AwaitingPayment"  => "🟠 Chờ thanh toán QR",
+                                        "Paid"             => "💚 Đã thanh toán",
+                                        "Processing"       => "📦 Đang chuẩn bị",
+                                        "Shipped"          => "🚚 Đang giao",
+                                        "Delivered"        => "✅ Đã giao",
+                                        "Cancelled"        => "❌ Đã hủy",
+                                        _                  => order.OrderStatus
                                     };
                                 }
                                 <span class="status-badge @statusClass">@statusText</span>
@@ -230,10 +258,21 @@
                                     <span style="color: var(--text-muted); font-size: 0.85rem;">Tổng cộng: </span>
                                     <span class="order-total">@order.TotalAmount.ToString("N0")₫</span>
                                 </div>
-                                <a asp-controller="Account" asp-action="OrderDetail" asp-route-id="@order.Id"
-                                   class="btn-view-detail">
-                                    <i class="bi bi-eye"></i> Xem chi tiết
-                                </a>
+                                <div style="display:flex; align-items:center; flex-wrap:wrap; gap:0.35rem;">
+                                    @if (order.OrderStatus == "AwaitingPayment")
+                                    {
+                                        <a asp-controller="Cart" asp-action="PayByQR"
+                                           asp-route-orderId="@order.Id"
+                                           asp-route-amount="@order.TotalAmount"
+                                           class="btn-pay-qr">
+                                            <i class="bi bi-qr-code-scan"></i> Thanh toán QR
+                                        </a>
+                                    }
+                                    <a asp-controller="Account" asp-action="OrderDetail" asp-route-id="@order.Id"
+                                       class="btn-view-detail">
+                                        <i class="bi bi-eye"></i> Xem chi tiết
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     }

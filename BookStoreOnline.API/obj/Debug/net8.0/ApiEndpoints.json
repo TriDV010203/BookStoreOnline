@@ -337,6 +337,64 @@
     ]
   },
   {
+    "ContainingType": "BookStoreOnline.API.Controllers.PaymentController",
+    "Method": "ExpireOrder",
+    "RelativePath": "api/Payment/expire/{orderId}",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "orderId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BookStoreOnline.API.Controllers.PaymentController",
+    "Method": "GetPaymentStatus",
+    "RelativePath": "api/Payment/status/{orderId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "orderId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BookStoreOnline.API.Controllers.PaymentController",
+    "Method": "Test",
+    "RelativePath": "api/Payment/test",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BookStoreOnline.API.Controllers.PaymentController",
+    "Method": "SepayWebhook",
+    "RelativePath": "api/Payment/webhook",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "payload",
+        "Type": "BookStoreOnline.API.Controllers.SepayWebhookPayload",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "BookStoreOnline.API.Controllers.ReviewsController",
     "Method": "GetAllReviews",
     "RelativePath": "api/Reviews",

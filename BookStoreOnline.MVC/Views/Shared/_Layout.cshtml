@@ -159,11 +159,25 @@
     <!-- ===== TOAST NOTIFICATION ===== -->
     @if (TempData["SuccessMessage"] != null)
     {
-        <div class="toast-container-book" id="toastContainer">
-            <div class="toast-book success" id="toastMsg">
+        <div class="toast-container-book" id="toastSuccess">
+            <div class="toast-book success" id="toastMsgSuccess">
                 <i class="bi bi-check-circle-fill" style="color: #4ade80; font-size: 1.1rem; flex-shrink: 0;"></i>
                 <span class="toast-text">@TempData["SuccessMessage"]</span>
-                <button class="toast-close" onclick="dismissToast()">
+                <button class="toast-close" onclick="dismissToast('toastSuccess')">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="toast-container-book" id="toastError" style="bottom: calc(2rem + @(TempData["SuccessMessage"] != null ? "5rem" : "0px"))">
+            <div class="toast-book" id="toastMsgError"
+                 style="background:rgba(248,113,113,0.12);border:1px solid rgba(248,113,113,0.3);color:#f87171;">
+                <i class="bi bi-exclamation-triangle-fill" style="color: #f87171; font-size: 1.1rem; flex-shrink: 0;"></i>
+                <span class="toast-text">@TempData["ErrorMessage"]</span>
+                <button class="toast-close" onclick="dismissToast('toastError')">
                     <i class="bi bi-x-lg"></i>
                 </button>
             </div>
@@ -225,17 +239,18 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // Toast auto-dismiss
-        function dismissToast() {
-            var toast = document.getElementById('toastMsg');
-            var container = document.getElementById('toastContainer');
-            if (toast) {
-                toast.style.animation = 'slideOut 0.3s ease forwards';
-                setTimeout(() => { if (container) container.remove(); }, 350);
+        function dismissToast(id) {
+            var container = document.getElementById(id);
+            if (container) {
+                container.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                container.style.opacity = '0';
+                container.style.transform = 'translateX(20px)';
+                setTimeout(() => container.remove(), 320);
             }
         }
-        // Auto dismiss sau 4s
-        setTimeout(dismissToast, 4000);
+        // Auto-dismiss sau 3s
+        setTimeout(() => dismissToast('toastSuccess'), 3000);
+        setTimeout(() => dismissToast('toastError'), 3000);
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)

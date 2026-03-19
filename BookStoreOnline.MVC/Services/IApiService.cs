@@ -27,11 +27,13 @@ namespace BookStoreOnline.MVC.Services
         Task<(bool success, string message)> ChangePasswordAsync(int id, ChangePasswordViewModel model);
 
         // ===== ORDERS =====
-        Task<(bool success, string message)> PlaceOrderAsync(int userId, string shippingAddress, List<CartItemViewModel> items);
+        Task<(bool success, string message, int orderId)> PlaceOrderAsync(int userId, string shippingAddress, List<CartItemViewModel> items, string paymentMethod = "COD");
         Task<List<OrderViewModel>> GetOrdersByUserAsync(int userId);
         Task<List<OrderViewModel>> GetAllOrdersAsync();
         Task<OrderViewModel?> GetOrderDetailAsync(int orderId);
         Task<(bool success, string message)> UpdateOrderStatusAsync(int orderId, string status);
+        Task<(bool isPaid, string status)> GetPaymentStatusAsync(int orderId);
+        Task<bool> ExpireOrderAsync(int orderId);
 
         // ===== USERS (ADMIN) =====
         Task<List<UserAdminViewModel>> GetAllUsersAsync();

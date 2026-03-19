@@ -7,6 +7,7 @@ namespace BookStoreOnline.MVC.Models
         public decimal TotalAmount { get; set; }
         public string OrderStatus { get; set; } = "Pending";
         public string ShippingAddress { get; set; } = "";
+        public string PaymentMethod { get; set; } = "COD";
         public int UserId { get; set; }
         public string? UserFullName { get; set; }
         public string? UserEmail { get; set; }

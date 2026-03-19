@@ -92,6 +92,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2FydFxPcmRlclN1Y2Nlc3MuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[B:/Project cá nhân/BookStoreOnline/BookStoreOnline.MVC/Views/Cart/PayByQR.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2FydFxQYXlCeVFSLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
 [B:/Project cá nhân/BookStoreOnline/BookStoreOnline.MVC/Views/Home/Detail.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxEZXRhaWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 

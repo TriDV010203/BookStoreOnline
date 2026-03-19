@@ -93,7 +93,7 @@ namespace BookStoreOnline.API.Controllers
 
             if (order == null) return NotFound("Không tìm thấy đơn hàng.");
 
-            var validStatuses = new[] { "Pending", "Processing", "Shipped", "Delivered", "Cancelled" };
+            var validStatuses = new[] { "Pending", "AwaitingPayment", "Paid", "Processing", "Shipped", "Delivered", "Cancelled" };
             if (!validStatuses.Contains(request.Status))
                 return BadRequest("Trạng thái không hợp lệ.");
 

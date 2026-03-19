@@ -8,11 +8,13 @@ namespace BookStoreOnline.MVC.Controllers
     public class CartController : Controller
     {
         private readonly IApiService _apiService;
+        private readonly IConfiguration _config;
         private const string CartSessionKey = "ShoppingCart";
 
-        public CartController(IApiService apiService)
+        public CartController(IApiService apiService, IConfiguration config)
         {
             _apiService = apiService;
+            _config = config;
         }
 
         // ── Lấy giỏ hàng từ Session ──────────────────────────────────────────
@@ -117,7 +119,6 @@ namespace BookStoreOnline.MVC.Controllers
         [HttpGet]
         public IActionResult Checkout()
         {
-            // Phải đăng nhập
             if (HttpContext.Session.GetString("UserEmail") == null)
                 return RedirectToAction("Login", "Account", new { returnUrl = "/Cart/Checkout" });
 
@@ -159,18 +160,57 @@ namespace BookStoreOnline.MVC.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
-            var (success, message) = await _apiService.PlaceOrderAsync(userId, model.ShippingAddress, cart);
+            var paymentMethod = model.PaymentMethod == "QR" ? "QR" : "COD";
+            var (success, message, orderId) = await _apiService.PlaceOrderAsync(userId, model.ShippingAddress, cart, paymentMethod);
 
             if (success)
             {
-                // Xóa giỏ hàng sau khi đặt thành công
                 HttpContext.Session.Remove(CartSessionKey);
+
+                if (paymentMethod == "QR")
+                {
+                    // Redirect đến trang QR để người dùng quét và thanh toán
+                    var totalAmount = cart.Sum(i => i.SubTotal);
+                    return RedirectToAction("PayByQR", new { orderId, amount = totalAmount });
+                }
+
                 TempData["SuccessMessage"] = message;
                 return RedirectToAction("OrderSuccess");
             }
 
             ModelState.AddModelError(string.Empty, message);
             return View(model);
+        }
+
+        // ── GET /Cart/PayByQR ─────────────────────────────────────────────────
+        [HttpGet]
+        public IActionResult PayByQR(int orderId, decimal amount)
+        {
+            if (HttpContext.Session.GetString("UserEmail") == null)
+                return RedirectToAction("Login", "Account");
+
+            ViewBag.OrderId = orderId;
+            ViewBag.Amount = amount;
+            ViewBag.BankCode = _config["BankInfo:BankCode"] ?? "MB";
+            ViewBag.AccountNo = _config["BankInfo:AccountNo"] ?? "0000000000";
+            ViewBag.AccountName = _config["BankInfo:AccountName"] ?? "BOOK STORE";
+            return View();
+        }
+
+        // ── GET /Cart/CheckPaymentStatus (AJAX polling) ────────────────────────
+        [HttpGet]
+        public async Task<IActionResult> CheckPaymentStatus(int orderId)
+        {
+            var (isPaid, status) = await _apiService.GetPaymentStatusAsync(orderId);
+            return Json(new { isPaid, status });
+        }
+
+        // ── POST /Cart/ExpireOrder (AJAX – gọi khi countdown hết giờ) ────────────
+        [HttpPost]
+        public async Task<IActionResult> ExpireOrder(int orderId)
+        {
+            var cancelled = await _apiService.ExpireOrderAsync(orderId);
+            return Json(new { cancelled });
         }
 
         // ── GET /Cart/OrderSuccess ────────────────────────────────────────────

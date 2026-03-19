@@ -9,8 +9,12 @@ namespace BookStoreOnline.MVC.Models
         [Display(Name = "Địa chỉ giao hàng")]
         public string ShippingAddress { get; set; } = string.Empty;
 
+        // COD hoặc QR
+        public string PaymentMethod { get; set; } = "COD";
+
         // Readonly — hiển thị để xác nhận
         public List<CartItemViewModel> Items { get; set; } = new();
         public decimal TotalAmount => Items.Sum(i => i.SubTotal);
     }
 }
+

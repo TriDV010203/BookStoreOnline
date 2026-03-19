@@ -108,6 +108,84 @@
 
     .checkout-total-row span:last-child { color: var(--primary); }
 
+    /* ── Payment Method Cards ── */
+    .payment-options {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.85rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .payment-option {
+        position: relative;
+        cursor: pointer;
+    }
+
+    .payment-option input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+        width: 0; height: 0;
+    }
+
+    .payment-option-label {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 1.1rem 0.75rem;
+        border: 2px solid var(--border-color);
+        border-radius: 14px;
+        background: rgba(255,255,255,0.02);
+        transition: all 0.2s;
+        cursor: pointer;
+        text-align: center;
+        user-select: none;
+    }
+
+    .payment-option input[type="radio"]:checked + .payment-option-label {
+        border-color: var(--primary);
+        background: rgba(201,168,76,0.08);
+        box-shadow: 0 0 0 3px rgba(201,168,76,0.15);
+    }
+
+    .payment-option-label:hover {
+        border-color: rgba(201,168,76,0.4);
+        background: rgba(201,168,76,0.04);
+    }
+
+    .payment-option-icon {
+        font-size: 1.75rem;
+        line-height: 1;
+    }
+
+    .payment-option-name {
+        font-weight: 700;
+        font-size: 0.88rem;
+        color: var(--text-light);
+    }
+
+    .payment-option-desc {
+        font-size: 0.73rem;
+        color: var(--text-muted);
+        line-height: 1.3;
+    }
+
+    .payment-option input:checked + .payment-option-label .payment-option-name {
+        color: var(--primary);
+    }
+
+    .check-badge {
+        display: none;
+        position: absolute;
+        top: 8px;
+        right: 10px;
+        color: var(--primary);
+        font-size: 1rem;
+    }
+
+    .payment-option input:checked ~ .check-badge { display: block; }
+
     .btn-place-order {
         width: 100%;
         background: linear-gradient(135deg, var(--primary), #8a6e2f);
@@ -119,7 +197,7 @@
         font-weight: 700;
         cursor: pointer;
         transition: all 0.25s;
-        margin-top: 1.25rem;
+        margin-top: 0.25rem;
         letter-spacing: 0.3px;
     }
 
@@ -133,10 +211,10 @@
 <section class="checkout-page">
     <div class="container">
         <h1 class="checkout-title"><i class="bi bi-bag-check me-2"></i>Xác nhận đơn hàng</h1>
-        <p class="checkout-subtitle">Kiểm tra lại đơn hàng và nhập địa chỉ giao hàng</p>
+        <p class="checkout-subtitle">Kiểm tra lại đơn hàng, nhập địa chỉ và chọn phương thức thanh toán</p>
 
         <div class="row g-4">
-            <!-- Shipping form -->
+            <!-- Shipping form + Payment -->
             <div class="col-12 col-lg-7">
                 <div class="checkout-card">
                     <div class="checkout-card-title">
@@ -148,7 +226,7 @@
 
                         <div asp-validation-summary="ModelOnly" class="alert-book alert-danger-book mb-3"></div>
 
-                        <div class="form-group-book">
+                        <div class="form-group-book" style="margin-bottom:1.5rem">
                             <label class="form-label-book" asp-for="ShippingAddress">
                                 <i class="bi bi-house me-1"></i>Địa chỉ giao hàng
                             </label>
@@ -159,8 +237,39 @@
                             <span asp-validation-for="ShippingAddress" class="field-error"></span>
                         </div>
 
-                        <button type="submit" class="btn-place-order">
-                            <i class="bi bi-check2-circle me-2"></i>Xác nhận đặt hàng
+                        <!-- Payment Method Selection -->
+                        <div class="form-group-book" style="margin-bottom:1rem">
+                            <label class="form-label-book" style="margin-bottom:0.75rem">
+                                <i class="bi bi-credit-card me-1"></i>Phương thức thanh toán
+                            </label>
+
+                            <div class="payment-options">
+                                <!-- COD -->
+                                <label class="payment-option">
+                                    <input type="radio" name="PaymentMethod" value="COD" checked id="pmCOD" />
+                                    <div class="payment-option-label">
+                                        <div class="payment-option-icon">💵</div>
+                                        <div class="payment-option-name">Tiền mặt</div>
+                                        <div class="payment-option-desc">Thanh toán khi nhận hàng (COD)</div>
+                                    </div>
+                                    <i class="bi bi-check-circle-fill check-badge"></i>
+                                </label>
+
+                                <!-- QR -->
+                                <label class="payment-option">
+                                    <input type="radio" name="PaymentMethod" value="QR" id="pmQR" />
+                                    <div class="payment-option-label">
+                                        <div class="payment-option-icon">📱</div>
+                                        <div class="payment-option-name">QR / Chuyển khoản</div>
+                                        <div class="payment-option-desc">Quét mã QR, xác nhận tức thì</div>
+                                    </div>
+                                    <i class="bi bi-check-circle-fill check-badge"></i>
+                                </label>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-place-order" id="submitBtn">
+                            <i class="bi bi-check2-circle me-2"></i><span id="submitLabel">Xác nhận đặt hàng</span>
                         </button>
                     </form>
                 </div>
@@ -210,4 +319,15 @@
 
 @section Scripts {
     @await Html.PartialAsync("_ValidationScriptsPartial")
+    <script>
+        // Thay đổi label nút theo phương thức thanh toán
+        const radios = document.querySelectorAll('input[name="PaymentMethod"]');
+        const label  = document.getElementById('submitLabel');
+
+        radios.forEach(r => r.addEventListener('change', () => {
+            label.textContent = r.value === 'QR'
+                ? 'Đặt hàng & Thanh toán QR'
+                : 'Xác nhận đặt hàng';
+        }));
+    </script>
 }

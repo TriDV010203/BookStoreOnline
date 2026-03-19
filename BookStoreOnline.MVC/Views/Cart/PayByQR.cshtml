@@ -1,0 +1,375 @@
+@{
+    ViewData["Title"] = "Thanh toán QR";
+    int orderId = ViewBag.OrderId;
+    decimal amount = ViewBag.Amount;
+    string bankCode = ViewBag.BankCode;
+    string accountNo = ViewBag.AccountNo;
+    string accountName = ViewBag.AccountName;
+
+    // Nội dung chuyển khoản – Sepay webhook sẽ đọc #orderId này
+    string transferContent = $"DH{orderId}";
+    string encodedContent = Uri.EscapeDataString(transferContent);
+    string amountStr = ((long)amount).ToString();
+
+    // VietQR public API – không cần đăng ký
+    string qrUrl = $"https://img.vietqr.io/image/{bankCode}-{accountNo}-compact2.png?amount={amountStr}&addInfo={encodedContent}&accountName={Uri.EscapeDataString(accountName)}";
+}
+
+@section Styles {
+<style>
+    .qr-page { padding: 3rem 0 5rem; }
+
+    .qr-wrapper {
+        max-width: 480px;
+        margin: 0 auto;
+        text-align: center;
+    }
+
+    .qr-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.7rem;
+        font-weight: 700;
+        color: var(--text-light);
+        margin-bottom: 0.25rem;
+    }
+
+    .qr-subtitle {
+        color: var(--text-muted);
+        font-size: 0.88rem;
+        margin-bottom: 2rem;
+    }
+
+    .qr-card {
+        background: var(--dark-card);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .qr-card::before {
+        content: '';
+        position: absolute;
+        top: -60px; left: -60px;
+        width: 200px; height: 200px;
+        background: radial-gradient(circle, rgba(201,168,76,0.08) 0%, transparent 70%);
+        pointer-events: none;
+    }
+
+    .qr-order-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: rgba(201,168,76,0.07);
+        border: 1px solid rgba(201,168,76,0.2);
+        border-radius: 12px;
+        padding: 0.85rem 1.25rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .qr-order-info .label { color: var(--text-muted); font-size: 0.83rem; }
+    .qr-order-info .value { color: var(--primary); font-weight: 800; font-size: 1.1rem; }
+    .qr-order-info .order-num { color: var(--text-light); font-weight: 700; font-size: 0.95rem; }
+
+    .qr-image-wrap {
+        background: white;
+        border-radius: 16px;
+        padding: 1rem;
+        display: inline-block;
+        margin-bottom: 1.25rem;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+    }
+
+    .qr-image-wrap img {
+        width: 220px;
+        height: 220px;
+        display: block;
+    }
+
+    .bank-info {
+        background: rgba(255,255,255,0.04);
+        border-radius: 12px;
+        padding: 0.85rem 1.25rem;
+        text-align: left;
+        margin-bottom: 1.25rem;
+    }
+
+    .bank-info-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.3rem 0;
+        font-size: 0.85rem;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .bank-info-row:last-child { border-bottom: none; }
+    .bank-info-row .bi-key { color: var(--text-muted); }
+    .bank-info-row .bi-val {
+        color: var(--text-light);
+        font-weight: 600;
+        text-align: right;
+        max-width: 56%;
+        word-break: break-all;
+    }
+
+    /* Countdown */
+    .qr-countdown {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(248,113,113,0.1);
+        border: 1px solid rgba(248,113,113,0.25);
+        color: #f87171;
+        border-radius: 20px;
+        padding: 0.35rem 1rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Status area */
+    .qr-status {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.6rem;
+        font-size: 0.88rem;
+        color: var(--text-muted);
+        margin-bottom: 0.75rem;
+    }
+
+    .spinner-dot {
+        display: inline-block;
+        width: 8px; height: 8px;
+        border-radius: 50%;
+        background: var(--primary);
+        animation: pulse-dot 1s infinite;
+    }
+
+    @@keyframes pulse-dot {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50%       { opacity: 0.4; transform: scale(0.6); }
+    }
+
+    /* Paid overlay */
+    .paid-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(10,10,15,0.85);
+        z-index: 9999;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn 0.4s ease;
+    }
+
+    @@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .paid-card {
+        background: var(--dark-card);
+        border: 1px solid rgba(74,222,128,0.4);
+        border-radius: 24px;
+        padding: 3rem 2.5rem;
+        text-align: center;
+        max-width: 380px;
+        width: 90%;
+        box-shadow: 0 0 60px rgba(74,222,128,0.15);
+        animation: slideUp 0.4s ease;
+    }
+
+    @@keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    .paid-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        animation: bounceIn 0.6s ease;
+    }
+
+    @@keyframes bounceIn {
+        0%   { transform: scale(0); }
+        60%  { transform: scale(1.15); }
+        100% { transform: scale(1); }
+    }
+
+    .paid-title { font-size: 1.5rem; font-weight: 800; color: #4ade80; margin-bottom: 0.5rem; }
+    .paid-sub   { color: var(--text-muted); font-size: 0.88rem; }
+</style>
+}
+
+<section class="qr-page">
+    <div class="container">
+        <div class="qr-wrapper">
+            <h1 class="qr-title"><i class="bi bi-qr-code-scan me-2"></i>Quét QR thanh toán</h1>
+            <p class="qr-subtitle">Dùng app ngân hàng quét mã QR bên dưới để hoàn tất đơn hàng</p>
+
+            <!-- Countdown -->
+            <div class="qr-countdown">
+                <i class="bi bi-clock"></i>
+                Còn lại: <span id="countdown">10:00</span>
+            </div>
+
+            <div class="qr-card">
+                <!-- Order info -->
+                <div class="qr-order-info">
+                    <div>
+                        <div class="label">Đơn hàng</div>
+                        <div class="order-num">#@orderId</div>
+                    </div>
+                    <div style="text-align:right">
+                        <div class="label">Số tiền cần thanh toán</div>
+                        <div class="value">@amount.ToString("N0")₫</div>
+                    </div>
+                </div>
+
+                <!-- QR Code -->
+                <div class="qr-image-wrap">
+                    <img src="@qrUrl"
+                         alt="Mã QR thanh toán"
+                         onerror="this.src='https://placehold.co/220x220/1a1a2e/c9a84c?text=QR+Error'" />
+                </div>
+
+                <!-- Bank Info -->
+                <div class="bank-info">
+                    <div class="bank-info-row">
+                        <span class="bi-key">Ngân hàng</span>
+                        <span class="bi-val">@bankCode</span>
+                    </div>
+                    <div class="bank-info-row">
+                        <span class="bi-key">Số tài khoản</span>
+                        <span class="bi-val">@accountNo</span>
+                    </div>
+                    <div class="bank-info-row">
+                        <span class="bi-key">Chủ tài khoản</span>
+                        <span class="bi-val">@accountName</span>
+                    </div>
+                    <div class="bank-info-row">
+                        <span class="bi-key">Số tiền</span>
+                        <span class="bi-val" style="color:var(--primary)">@amount.ToString("N0")₫</span>
+                    </div>
+                    <div class="bank-info-row">
+                        <span class="bi-key">Nội dung CK</span>
+                        <span class="bi-val" style="font-size:0.78rem">@transferContent</span>
+                    </div>
+                </div>
+
+                <!-- Polling status -->
+                <div class="qr-status" id="statusLine">
+                    <span class="spinner-dot"></span>
+                    Đang chờ xác nhận thanh toán...
+                </div>
+
+                <p style="font-size:0.78rem; color:var(--text-muted); margin:0;">
+                    ⚠ Vui lòng nhập <strong style="color:var(--text-light)">đúng số tiền và nội dung</strong> để hệ thống tự động xác nhận.
+                </p>
+            </div>
+
+            <a asp-controller="Cart" asp-action="Index"
+               style="color:var(--text-muted); font-size:0.85rem; text-decoration:none; display:inline-flex; align-items:center; gap:0.4rem;">
+                <i class="bi bi-arrow-left"></i> Quay lại giỏ hàng
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Paid Overlay -->
+<div class="paid-overlay" id="paidOverlay">
+    <div class="paid-card">
+        <div class="paid-icon">✅</div>
+        <div class="paid-title">Thanh toán thành công!</div>
+        <p class="paid-sub">Đơn hàng <strong>#@orderId</strong> của bạn đã được xác nhận.<br>Đang chuyển hướng...</p>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    const orderId = @orderId;
+    let pollInterval;
+    let countdownInterval;
+    let totalSeconds = 10 * 60; // 10 phút
+    let expired = false;
+
+    // ── Countdown ──────────────────────────────────────────────
+    async function onExpire() {
+        if (expired) return;
+        expired = true;
+        clearInterval(countdownInterval);
+        clearInterval(pollInterval);
+
+        // Gọi API để hủy đơn hàng + hoàn tồn kho
+        try {
+            const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value ?? '';
+            await fetch(`/Cart/ExpireOrder?orderId=${orderId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': token
+                }
+            });
+        } catch (e) { console.error('Expire error:', e); }
+
+        // Hiện overlay hết giờ
+        document.getElementById('countdown').textContent = '00:00';
+        document.getElementById('statusLine').innerHTML =
+            '<span style="color:#f87171"><i class="bi bi-x-circle me-1"></i>Hết thời gian – Đơn hàng đã bị hủy.</span>';
+
+        const overlay = document.getElementById('paidOverlay');
+        overlay.style.display = 'flex';
+        overlay.querySelector('.paid-icon').textContent = '❌';
+        overlay.querySelector('.paid-title').textContent   = 'Hết thời gian thanh toán!';
+        overlay.querySelector('.paid-title').style.color  = '#f87171';
+        overlay.querySelector('.paid-card').style.borderColor = 'rgba(248,113,113,0.4)';
+        overlay.querySelector('.paid-card').style.boxShadow   = '0 0 60px rgba(248,113,113,0.15)';
+        overlay.querySelector('.paid-sub').innerHTML =
+            `Đơn hàng <strong>#${orderId}</strong> đã bị hủy do không thanh toán trong 10 phút.<br>Đang quay về trang đơn hàng...`;
+
+        setTimeout(() => { window.location.href = '/Account/MyOrders'; }, 3000);
+    }
+
+    function updateCountdown() {
+        const m = Math.floor(totalSeconds / 60);
+        const s = totalSeconds % 60;
+        document.getElementById('countdown').textContent =
+            String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+
+        if (totalSeconds <= 0) {
+            onExpire();
+            return;
+        }
+        totalSeconds--;
+    }
+
+    countdownInterval = setInterval(updateCountdown, 1000);
+    updateCountdown();
+
+    // ── Polling thanh toán ────────────────────────────────────
+    async function checkPayment() {
+        if (expired) return;
+        try {
+            const res = await fetch(`/Cart/CheckPaymentStatus?orderId=${orderId}`);
+            const data = await res.json();
+            if (data.isPaid) {
+                expired = true;
+                clearInterval(pollInterval);
+                clearInterval(countdownInterval);
+
+                // Hiển thị overlay thành công
+                const overlay = document.getElementById('paidOverlay');
+                overlay.style.display = 'flex';
+
+                // Redirect sau 2.5s
+                setTimeout(() => { window.location.href = '/Cart/OrderSuccess'; }, 2500);
+            }
+        } catch (e) {
+            console.error('Poll error:', e);
+        }
+    }
+
+    // Poll ngay và mỗi 5 giây
+    checkPayment();
+    pollInterval = setInterval(checkPayment, 5000);
+</script>
+}

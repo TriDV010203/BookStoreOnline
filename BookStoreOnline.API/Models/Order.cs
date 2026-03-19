@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BookStoreOnline.API.Models
@@ -21,7 +21,10 @@ namespace BookStoreOnline.API.Models
         public decimal TotalAmount { get; set; }
 
         [MaxLength(50)]
-        public string OrderStatus { get; set; } = "Pending"; // Pending, Processing, Shipped, Delivered, Cancelled
+        public string OrderStatus { get; set; } = "Pending"; // Pending, AwaitingPayment, Paid, Processing, Shipped, Delivered, Cancelled
+
+        [MaxLength(20)]
+        public string PaymentMethod { get; set; } = "COD"; // COD, QR
 
         [Required]
         [MaxLength(500)]
