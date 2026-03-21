@@ -47,6 +47,23 @@
                             <i class="bi bi-cart3"></i>
                         </a>
 
+                        <!-- Chuông thông báo user -->
+                        <div class="position-relative" id="userBellWrap">
+                            <button id="userBellBtn" onclick="toggleUserBell()"
+                                    style="background:none;border:none;font-size:1.3rem;color:var(--text-muted);padding:.25rem .5rem;cursor:pointer;position:relative;transition:color .2s"
+                                    title="Thông báo">
+                                <i class="bi bi-bell"></i>
+                                <span id="userBellBadge" style="display:none;position:absolute;top:-2px;right:-2px;background:#ef4444;color:#fff;font-size:.6rem;font-weight:700;border-radius:50%;width:16px;height:16px;line-height:16px;text-align:center">0</span>
+                            </button>
+                            <div id="userBellPanel" style="display:none;position:absolute;top:calc(100% + 8px);right:0;width:320px;background:#1e2130;border:1px solid rgba(255,255,255,.1);border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.5);z-index:9999;overflow:hidden">
+                                <div style="padding:.75rem 1rem;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between">
+                                    <span style="font-weight:600;font-size:.85rem;color:#e2e8f0">🔔 Thông báo</span>
+                                    <button onclick="markAllRead()" style="background:none;border:none;color:#818cf8;font-size:.75rem;cursor:pointer">§ánh dấu tất cả đã đọc</button>
+                                </div>
+                                <div id="userNotifList" style="max-height:320px;overflow-y:auto"></div>
+                            </div>
+                        </div>
+
                         <div class="dropdown user-dropdown">
                             <button class="btn btn-link nav-link d-flex align-items-center gap-2 text-decoration-none"
                                     data-bs-toggle="dropdown" aria-expanded="false">
@@ -254,5 +271,82 @@
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)
+
+    @if (Context.Session.GetString("UserEmail") != null)
+    {
+        <script>
+            // ===== USER BELL NOTIFICATION =====
+            var userBellOpen = false;
+
+            function toggleUserBell() {
+                userBellOpen = !userBellOpen;
+                document.getElementById('userBellPanel').style.display = userBellOpen ? 'block' : 'none';
+                if (userBellOpen) loadUserNotifications();
+            }
+
+            function loadUserNotifications() {
+                fetch('/Home/GetNotifications')
+                    .then(r => r.json())
+                    .then(data => {
+                        updateBellBadge(data.unread);
+                        var list = document.getElementById('userNotifList');
+                        if (!data.notifications || data.notifications.length === 0) {
+                            list.innerHTML = '<div style="padding:1.5rem;text-align:center;color:#94a3b8;font-size:.85rem">🔔 Chưa có thông báo nào</div>';
+                            return;
+                        }
+                        list.innerHTML = data.notifications.map(n => {
+                            var icon = n.type === 'Discount' ? '🎉' : '📦';
+                            var readStyle = n.isRead ? 'opacity:.6' : 'font-weight:600';
+                            var bg = n.isRead ? '' : 'background:rgba(99,102,241,.07);';
+                            return '<div style="padding:.75rem 1rem;border-bottom:1px solid rgba(255,255,255,.05);cursor:pointer;' + bg + readStyle + '" onclick="markRead(' + n.id + ', this)">' +
+                                '<div style="display:flex;gap:.6rem;align-items:flex-start">' +
+                                '<span style="font-size:1.1rem;flex-shrink:0">' + icon + '</span>' +
+                                '<div><div style="font-size:.82rem;color:#e2e8f0">' + n.title + '</div>' +
+                                (n.message ? '<div style="font-size:.76rem;color:#94a3b8;margin-top:.2rem">' + n.message + '</div>' : '') +
+                                '<div style="font-size:.7rem;color:#64748b;margin-top:.2rem">' + new Date(n.createdAt).toLocaleString('vi-VN') + '</div>' +
+                                '</div></div></div>';
+                        }).join('');
+                    })
+                    .catch(() => {});
+            }
+
+            function updateBellBadge(count) {
+                var badge = document.getElementById('userBellBadge');
+                var btn = document.getElementById('userBellBtn');
+                if (count > 0) {
+                    badge.textContent = count > 9 ? '9+' : count;
+                    badge.style.display = 'block';
+                    btn.style.color = '#f59e0b';
+                } else {
+                    badge.style.display = 'none';
+                    btn.style.color = '';
+                }
+            }
+
+            function markRead(id, el) {
+                fetch('/Home/MarkNotificationRead?id=' + id, { method: 'POST', headers: { 'RequestVerificationToken': document.querySelector('[name=__RequestVerificationToken]')?.value || '' } })
+                    .then(() => { el.style.opacity = '.6'; el.style.fontWeight = '400'; el.style.background = ''; loadUserNotifications(); })
+                    .catch(() => {});
+            }
+
+            function markAllRead() {
+                fetch('/Home/MarkAllNotificationsRead', { method: 'POST' })
+                    .then(() => loadUserNotifications())
+                    .catch(() => {});
+            }
+
+            // Close when clicking outside
+            document.addEventListener('click', function(e) {
+                if (userBellOpen && !e.target.closest('#userBellWrap')) {
+                    document.getElementById('userBellPanel').style.display = 'none';
+                    userBellOpen = false;
+                }
+            });
+
+            // Load on page open + poll every 30s
+            loadUserNotifications();
+            setInterval(loadUserNotifications, 30000);
+        </script>
+    }
 </body>
 </html>

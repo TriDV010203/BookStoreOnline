@@ -27,12 +27,19 @@ namespace BookStoreOnline.MVC.Controllers
             var booksTask    = _apiService.GetBooksAsync();
             var categoriesTask = _apiService.GetCategoriesAsync();
             var reviewsTask  = _apiService.GetAllReviewsAsync();
+            var discountsTask = _apiService.GetDiscountsAsync();
 
-            await Task.WhenAll(booksTask, categoriesTask, reviewsTask);
+            await Task.WhenAll(booksTask, categoriesTask, reviewsTask, discountsTask);
 
             var books      = booksTask.Result;
             var categories = categoriesTask.Result;
             var allReviews = reviewsTask.Result;
+            var discounts  = discountsTask.Result;
+
+            // Build active discounts lookup per categoryId
+            var now = DateTime.Now;
+            var activeDiscounts = discounts.Where(d =>
+                d.IsActive && d.StartDate <= now && (d.EndDate == null || d.EndDate >= now)).ToList();
 
             // Attach per-book rating stats
             var ratingByBook = allReviews
@@ -46,6 +53,18 @@ namespace BookStoreOnline.MVC.Controllers
                     b.AverageRating = stat.avg;
                     b.ReviewCount   = stat.count;
                 }
+                // Apply best discount
+                decimal best = 0;
+                foreach (var d in activeDiscounts)
+                {
+                    if (d.ApplyToAll && d.DiscountPercent > best) best = d.DiscountPercent;
+                    else if (!d.ApplyToAll && !string.IsNullOrEmpty(d.CategoryIds))
+                    {
+                        var ids = d.CategoryIds.Split(',').Select(s => int.TryParse(s.Trim(), out int v) ? v : 0);
+                        if (ids.Contains(b.CategoryId) && d.DiscountPercent > best) best = d.DiscountPercent;
+                    }
+                }
+                b.DiscountPercent = best;
             }
 
             // Filter by keyword
@@ -95,6 +114,10 @@ namespace BookStoreOnline.MVC.Controllers
             var book = await _apiService.GetBookByIdAsync(id);
             if (book == null) return NotFound();
 
+            // Load discount for this book and apply
+            var discountPercent = await _apiService.GetDiscountPercentForBookAsync(id);
+            book.DiscountPercent = discountPercent;
+
             var reviews = await _apiService.GetReviewsByBookAsync(id);
 
             var vm = new BookDetailViewModel
@@ -141,6 +164,36 @@ namespace BookStoreOnline.MVC.Controllers
         public IActionResult Privacy()
         {
             return View();
+        }
+
+        // ===== AJAX: User Bell Notifications =====
+
+        [HttpGet]
+        public async Task<IActionResult> GetNotifications()
+        {
+            var userIdStr = HttpContext.Session.GetString("UserId");
+            if (!int.TryParse(userIdStr, out int userId))
+                return Json(new { notifications = new object[0], unread = 0 });
+
+            var notifications = await _apiService.GetUserNotificationsAsync(userId);
+            var unread = notifications.Count(n => !n.IsRead);
+            return Json(new { notifications, unread });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> MarkNotificationRead(int id)
+        {
+            await _apiService.MarkNotificationReadAsync(id);
+            return Json(new { ok = true });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> MarkAllNotificationsRead()
+        {
+            var userIdStr = HttpContext.Session.GetString("UserId");
+            if (int.TryParse(userIdStr, out int userId))
+                await _apiService.MarkAllNotificationsReadAsync(userId);
+            return Json(new { ok = true });
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

@@ -202,6 +202,10 @@
                                     <div class="book-placeholder-icon">📖</div>
                                 }
                                 <span class="book-category-badge">@book.CategoryName</span>
+                                @if (book.DiscountPercent > 0)
+                                {
+                                    <span class="book-discount-badge">-@book.DiscountPercent%</span>
+                                }
                             </div>
 
                             <!-- Book Body -->
@@ -211,9 +215,17 @@
                                 <p class="book-desc">@book.Description</p>
 
                                 <div class="book-footer">
-                                    <span class="book-price">
-                                        @book.Price.ToString("N0")₫
-                                    </span>
+                                    @if (book.DiscountPercent > 0 && book.DiscountedPrice.HasValue)
+                                    {
+                                        <div>
+                                            <span class="book-price" style="color:#f59e0b">@book.DiscountedPrice.Value.ToString("N0")₫</span>
+                                            <span style="font-size:.75rem;color:var(--text-muted);text-decoration:line-through;margin-left:.3rem">@book.Price.ToString("N0")₫</span>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="book-price">@book.Price.ToString("N0")₫</span>
+                                    }
                                     <span class="book-stock @(book.StockQuantity > 0 ? "in-stock" : "out-stock")">
                                         @if (book.StockQuantity > 0)
                                         {
@@ -387,5 +399,20 @@
     .book-stars { color: #f59e0b; font-size: 0.82rem; letter-spacing: 0.02em; }
     .book-rating-text { color: #f59e0b; font-weight: 600; font-size: 0.8rem; }
     .book-review-count { color: var(--text-muted); font-weight: 400; }
+
+    /* Discount badge on book cover */
+    .book-discount-badge {
+        position: absolute;
+        top: 8px; left: 8px;
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: white;
+        font-size: 0.72rem;
+        font-weight: 700;
+        padding: 0.22rem 0.55rem;
+        border-radius: 20px;
+        letter-spacing: 0.03em;
+        box-shadow: 0 2px 8px rgba(239,68,68,0.5);
+        z-index: 2;
+    }
 </style>
 }

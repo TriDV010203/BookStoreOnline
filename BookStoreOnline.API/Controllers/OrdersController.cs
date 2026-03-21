@@ -80,6 +80,19 @@ namespace BookStoreOnline.API.Controllers
             _context.Orders.Add(order);
             await _context.SaveChangesAsync();
 
+            // Tạo thông báo cho người dùng
+            var notification = new UserNotification
+            {
+                UserId = order.UserId,
+                Title = "Đặt hàng thành công!",
+                Message = $"Đơn hàng #{order.Id} của bạn đã được tiếp nhận và đang được xử lý.",
+                Type = "Order",
+                IsRead = false,
+                CreatedAt = DateTime.UtcNow
+            };
+            _context.UserNotifications.Add(notification);
+            await _context.SaveChangesAsync();
+
             return CreatedAtAction("GetOrder", new { id = order.Id }, order);
         }
 

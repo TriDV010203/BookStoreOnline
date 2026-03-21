@@ -1,0 +1,109 @@
+@model List<BookStoreOnline.MVC.Models.DiscountViewModel>
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Quản lý Giảm giá";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold mb-0" style="color:var(--text-primary)">🎫 Chương trình Giảm giá</h2>
+        <p style="color:var(--text-muted);font-size:.875rem">Quản lý mã giảm giá theo % cho sách</p>
+    </div>
+    <a asp-action="DiscountCreate" class="btn-admin-primary">
+        <i class="bi bi-plus-lg"></i> Tạo giảm giá mới
+    </a>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="admin-card" style="text-align:center;padding:3rem">
+        <i class="bi bi-tag" style="font-size:3rem;color:var(--text-muted)"></i>
+        <p style="color:var(--text-muted);margin-top:1rem">Chưa có chương trình giảm giá nào.</p>
+        <a asp-action="DiscountCreate" class="btn-admin-primary mt-2">Tạo ngay</a>
+    </div>
+}
+else
+{
+    <div class="admin-card">
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Tên chương trình</th>
+                        <th>Giảm</th>
+                        <th>Áp dụng</th>
+                        <th>Thời hạn</th>
+                        <th>Trạng thái</th>
+                        <th style="width:140px">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var d in Model)
+                    {
+                        <tr>
+                            <td>
+                                <div style="font-weight:600;color:var(--text-primary)">@d.Name</div>
+                                @if (!string.IsNullOrEmpty(d.Description))
+                                {
+                                    <div style="font-size:.78rem;color:var(--text-muted)">@d.Description</div>
+                                }
+                            </td>
+                            <td>
+                                <span style="font-size:1.2rem;font-weight:700;color:#f59e0b">@d.DiscountPercent%</span>
+                            </td>
+                            <td>
+                                @if (d.ApplyToAll)
+                                {
+                                    <span class="badge" style="background:rgba(99,102,241,.15);color:#6366f1;padding:.3rem .7rem;border-radius:999px;font-size:.78rem">Tất cả sách</span>
+                                }
+                                else
+                                {
+                                    <span class="badge" style="background:rgba(14,165,233,.15);color:#0ea5e9;padding:.3rem .7rem;border-radius:999px;font-size:.78rem">Theo danh mục</span>
+                                }
+                            </td>
+                            <td style="font-size:.82rem">
+                                <div>Từ: @d.StartDate.ToString("dd/MM/yyyy")</div>
+                                @if (d.EndDate.HasValue)
+                                {
+                                    <div>Đến: @d.EndDate.Value.ToString("dd/MM/yyyy")</div>
+                                }
+                                else
+                                {
+                                    <div style="color:#10b981">Vĩnh viễn</div>
+                                }
+                            </td>
+                            <td>
+                                @if (!d.IsActive)
+                                {
+                                    <span style="background:rgba(239,68,68,.1);color:#ef4444;padding:.3rem .7rem;border-radius:999px;font-size:.78rem;display:inline-block">Tắt</span>
+                                }
+                                else if (d.IsExpired)
+                                {
+                                    <span style="background:rgba(156,163,175,.1);color:#9ca3af;padding:.3rem .7rem;border-radius:999px;font-size:.78rem;display:inline-block">Hết hạn</span>
+                                }
+                                else
+                                {
+                                    <span style="background:rgba(16,185,129,.1);color:#10b981;padding:.3rem .7rem;border-radius:999px;font-size:.78rem;display:inline-block">✓ Đang chạy</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <a asp-action="DiscountEdit" asp-route-id="@d.Id" class="btn-admin-secondary" title="Sửa">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form asp-action="DiscountDelete" asp-route-id="@d.Id" method="post" id="del-@d.Id">
+                                        @Html.AntiForgeryToken()
+                                        <button type="button" class="btn-admin-delete" title="Xóa"
+                                                onclick="confirmDelete('del-@d.Id', '@Html.Raw(d.Name.Replace("'","\\\'"))')">
+                                            <i class="bi bi-trash3"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

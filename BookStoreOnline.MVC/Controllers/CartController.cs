@@ -1,6 +1,8 @@
+using BookStoreOnline.MVC.Hubs;
 using BookStoreOnline.MVC.Models;
 using BookStoreOnline.MVC.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using System.Text.Json;
 
 namespace BookStoreOnline.MVC.Controllers
@@ -9,12 +11,14 @@ namespace BookStoreOnline.MVC.Controllers
     {
         private readonly IApiService _apiService;
         private readonly IConfiguration _config;
+        private readonly IHubContext<OrderNotificationHub> _hubContext;
         private const string CartSessionKey = "ShoppingCart";
 
-        public CartController(IApiService apiService, IConfiguration config)
+        public CartController(IApiService apiService, IConfiguration config, IHubContext<OrderNotificationHub> hubContext)
         {
             _apiService = apiService;
             _config = config;
+            _hubContext = hubContext;
         }
 
         // ── Lấy giỏ hàng từ Session ──────────────────────────────────────────
@@ -56,6 +60,12 @@ namespace BookStoreOnline.MVC.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
+            // Lấy % giảm giá đang áp dụng (nếu có)
+            var discountPercent = await _apiService.GetDiscountPercentForBookAsync(bookId);
+            var unitPrice = discountPercent > 0
+                ? Math.Round(book.Price * (1 - discountPercent / 100), 0)
+                : book.Price;
+
             var cart = GetCartFromSession();
             var existing = cart.FirstOrDefault(c => c.BookId == bookId);
 
@@ -63,6 +73,10 @@ namespace BookStoreOnline.MVC.Controllers
             {
                 int newQty = existing.Quantity + quantity;
                 existing.Quantity = Math.Min(newQty, book.StockQuantity);
+                // Cập nhật giá nếu discount thay đổi
+                existing.OriginalPrice = book.Price;
+                existing.UnitPrice = unitPrice;
+                existing.DiscountPercent = discountPercent;
             }
             else
             {
@@ -72,14 +86,20 @@ namespace BookStoreOnline.MVC.Controllers
                     Title = book.Title,
                     Author = book.Author,
                     ImageUrl = book.ImageUrl,
-                    UnitPrice = book.Price,
+                    OriginalPrice = book.Price,
+                    UnitPrice = unitPrice,
+                    DiscountPercent = discountPercent,
                     StockQuantity = book.StockQuantity,
                     Quantity = Math.Min(quantity, book.StockQuantity)
                 });
             }
 
             SaveCartToSession(cart);
-            TempData["SuccessMessage"] = $"Đã thêm \"{book.Title}\" vào giỏ hàng!";
+
+            if (discountPercent > 0)
+                TempData["SuccessMessage"] = $"Đã thêm \"{book.Title}\" vào giỏ hàng! (Đang giảm {discountPercent}%)";
+            else
+                TempData["SuccessMessage"] = $"Đã thêm \"{book.Title}\" vào giỏ hàng!";
 
             if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
                 return Redirect(returnUrl);
@@ -165,11 +185,18 @@ namespace BookStoreOnline.MVC.Controllers
 
             if (success)
             {
+                // Push realtime alert to admin group
+                await _hubContext.Clients.Group("admin").SendAsync("NewOrderAlert", new
+                {
+                    orderId,
+                    message = $"Đơn hàng mới #{orderId} cần xử lý!",
+                    time = DateTime.Now.ToString("HH:mm")
+                });
+
                 HttpContext.Session.Remove(CartSessionKey);
 
                 if (paymentMethod == "QR")
                 {
-                    // Redirect đến trang QR để người dùng quét và thanh toán
                     var totalAmount = cart.Sum(i => i.SubTotal);
                     return RedirectToAction("PayByQR", new { orderId, amount = totalAmount });
                 }

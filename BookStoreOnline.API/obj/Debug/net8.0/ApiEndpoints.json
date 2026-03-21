@@ -218,6 +218,283 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "BookStoreOnline.API.Controllers.DiscountsController",
+    "Method": "GetDiscounts",
+    "RelativePath": "api/Discounts",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.IEnumerable\u00601[[BookStoreOnline.API.Models.Discount, BookStoreOnline.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "BookStoreOnline.API.Controllers.DiscountsController",
+    "Method": "CreateDiscount",
+    "RelativePath": "api/Discounts",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "discount",
+        "Type": "BookStoreOnline.API.Models.Discount",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "BookStoreOnline.API.Models.Discount",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "BookStoreOnline.API.Controllers.DiscountsController",
+    "Method": "GetDiscount",
+    "RelativePath": "api/Discounts/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "BookStoreOnline.API.Models.Discount",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "BookStoreOnline.API.Controllers.DiscountsController",
+    "Method": "UpdateDiscount",
+    "RelativePath": "api/Discounts/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "discount",
+        "Type": "BookStoreOnline.API.Models.Discount",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BookStoreOnline.API.Controllers.DiscountsController",
+    "Method": "DeleteDiscount",
+    "RelativePath": "api/Discounts/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BookStoreOnline.API.Controllers.DiscountsController",
+    "Method": "GetActiveDiscounts",
+    "RelativePath": "api/Discounts/active",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.IEnumerable\u00601[[BookStoreOnline.API.Models.Discount, BookStoreOnline.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "BookStoreOnline.API.Controllers.DiscountsController",
+    "Method": "GetDiscountForBook",
+    "RelativePath": "api/Discounts/for-book/{bookId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "bookId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BookStoreOnline.API.Controllers.DiscountsController",
+    "Method": "GetDiscountForCategory",
+    "RelativePath": "api/Discounts/for-category/{categoryId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "categoryId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BookStoreOnline.API.Controllers.NotificationsController",
+    "Method": "CreateNotification",
+    "RelativePath": "api/Notifications",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "notification",
+        "Type": "BookStoreOnline.API.Models.UserNotification",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "BookStoreOnline.API.Models.UserNotification",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "BookStoreOnline.API.Controllers.NotificationsController",
+    "Method": "MarkRead",
+    "RelativePath": "api/Notifications/{id}/read",
+    "HttpMethod": "PATCH",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BookStoreOnline.API.Controllers.NotificationsController",
+    "Method": "BroadcastNotification",
+    "RelativePath": "api/Notifications/broadcast",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "req",
+        "Type": "BookStoreOnline.API.Controllers.BroadcastRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BookStoreOnline.API.Controllers.NotificationsController",
+    "Method": "GetUserNotifications",
+    "RelativePath": "api/Notifications/user/{userId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.IEnumerable\u00601[[BookStoreOnline.API.Models.UserNotification, BookStoreOnline.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "BookStoreOnline.API.Controllers.NotificationsController",
+    "Method": "MarkAllRead",
+    "RelativePath": "api/Notifications/user/{userId}/read-all",
+    "HttpMethod": "PATCH",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BookStoreOnline.API.Controllers.NotificationsController",
+    "Method": "GetUnreadCount",
+    "RelativePath": "api/Notifications/user/{userId}/unread-count",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "BookStoreOnline.API.Controllers.OrdersController",
     "Method": "GetOrders",
     "RelativePath": "api/Orders",

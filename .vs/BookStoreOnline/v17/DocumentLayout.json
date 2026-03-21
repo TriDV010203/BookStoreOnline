@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "B:\\Project c\u00E1 nh\u00E2n\\BookStoreOnline\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|B:\\Project c\u00E1 nh\u00E2n\\BookStoreOnline\\BookStoreOnline.API\\Migrations\\20260321184222_InitialCreate3.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:BookStoreOnline.API\\Migrations\\20260321184222_InitialCreate3.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{0967A480-409F-4E42-BF90-2D14A0DE0053}|BookStoreOnline.API\\BookStoreOnline.API.csproj|b:\\project c\u00E1 nh\u00E2n\\bookstoreonline\\bookstoreonline.api\\controllers\\paymentcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{0967A480-409F-4E42-BF90-2D14A0DE0053}|BookStoreOnline.API\\BookStoreOnline.API.csproj|solutionrelative:bookstoreonline.api\\controllers\\paymentcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -922,7 +926,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "Checkout.cshtml",
               "DocumentMoniker": "B:\\Project c\u00E1 nh\u00E2n\\BookStoreOnline\\BookStoreOnline.MVC\\Views\\Cart\\Checkout.cshtml",
               "RelativeDocumentMoniker": "BookStoreOnline.MVC\\Views\\Cart\\Checkout.cshtml",
@@ -934,7 +938,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "PayByQR.cshtml",
               "DocumentMoniker": "B:\\Project c\u00E1 nh\u00E2n\\BookStoreOnline\\BookStoreOnline.MVC\\Views\\Cart\\PayByQR.cshtml",
               "RelativeDocumentMoniker": "BookStoreOnline.MVC\\Views\\Cart\\PayByQR.cshtml",
@@ -946,7 +950,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 9,
               "Title": "CheckoutViewModel.cs",
               "DocumentMoniker": "B:\\Project c\u00E1 nh\u00E2n\\BookStoreOnline\\BookStoreOnline.MVC\\Models\\CheckoutViewModel.cs",
               "RelativeDocumentMoniker": "BookStoreOnline.MVC\\Models\\CheckoutViewModel.cs",
@@ -958,7 +962,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 10,
               "Title": "OrderViewModel.cs",
               "DocumentMoniker": "B:\\Project c\u00E1 nh\u00E2n\\BookStoreOnline\\BookStoreOnline.MVC\\Models\\OrderViewModel.cs",
               "RelativeDocumentMoniker": "BookStoreOnline.MVC\\Models\\OrderViewModel.cs",
@@ -970,7 +974,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 6,
               "Title": "OrdersController.cs",
               "DocumentMoniker": "B:\\Project c\u00E1 nh\u00E2n\\BookStoreOnline\\BookStoreOnline.API\\Controllers\\OrdersController.cs",
               "RelativeDocumentMoniker": "BookStoreOnline.API\\Controllers\\OrdersController.cs",
@@ -982,7 +986,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 7,
               "Title": "CartController.cs",
               "DocumentMoniker": "B:\\Project c\u00E1 nh\u00E2n\\BookStoreOnline\\BookStoreOnline.MVC\\Controllers\\CartController.cs",
               "RelativeDocumentMoniker": "BookStoreOnline.MVC\\Controllers\\CartController.cs",
@@ -994,7 +998,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 16,
+              "DocumentIndex": 17,
               "Title": "_ViewImports.cshtml",
               "DocumentMoniker": "B:\\Project c\u00E1 nh\u00E2n\\BookStoreOnline\\BookStoreOnline.MVC\\Views\\_ViewImports.cshtml",
               "RelativeDocumentMoniker": "BookStoreOnline.MVC\\Views\\_ViewImports.cshtml",
@@ -1006,7 +1010,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 17,
+              "DocumentIndex": 18,
               "Title": "_ViewStart.cshtml",
               "DocumentMoniker": "B:\\Project c\u00E1 nh\u00E2n\\BookStoreOnline\\BookStoreOnline.MVC\\Views\\_ViewStart.cshtml",
               "RelativeDocumentMoniker": "BookStoreOnline.MVC\\Views\\_ViewStart.cshtml",
@@ -1018,7 +1022,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 15,
+              "DocumentIndex": 16,
               "Title": "launchSettings.json",
               "DocumentMoniker": "B:\\Project c\u00E1 nh\u00E2n\\BookStoreOnline\\BookStoreOnline.API\\Properties\\launchSettings.json",
               "RelativeDocumentMoniker": "BookStoreOnline.API\\Properties\\launchSettings.json",
@@ -1030,7 +1034,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 5,
               "Title": "appsettings.json",
               "DocumentMoniker": "B:\\Project c\u00E1 nh\u00E2n\\BookStoreOnline\\BookStoreOnline.MVC\\appsettings.json",
               "RelativeDocumentMoniker": "BookStoreOnline.MVC\\appsettings.json",
@@ -1042,7 +1046,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 8,
               "Title": "Program.cs",
               "DocumentMoniker": "B:\\Project c\u00E1 nh\u00E2n\\BookStoreOnline\\BookStoreOnline.MVC\\Program.cs",
               "RelativeDocumentMoniker": "BookStoreOnline.MVC\\Program.cs",
@@ -1054,7 +1058,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 18,
+              "DocumentIndex": 19,
               "Title": "Orders.cshtml",
               "DocumentMoniker": "B:\\Project c\u00E1 nh\u00E2n\\BookStoreOnline\\BookStoreOnline.MVC\\Views\\Admin\\Orders.cshtml",
               "RelativeDocumentMoniker": "BookStoreOnline.MVC\\Views\\Admin\\Orders.cshtml",
@@ -1066,7 +1070,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "PaymentController.cs",
               "DocumentMoniker": "B:\\Project c\u00E1 nh\u00E2n\\BookStoreOnline\\BookStoreOnline.API\\Controllers\\PaymentController.cs",
               "RelativeDocumentMoniker": "BookStoreOnline.API\\Controllers\\PaymentController.cs",
@@ -1079,7 +1083,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 13,
               "Title": "Payment.cs",
               "DocumentMoniker": "B:\\Project c\u00E1 nh\u00E2n\\BookStoreOnline\\BookStoreOnline.API\\Models\\Payment.cs",
               "RelativeDocumentMoniker": "BookStoreOnline.API\\Models\\Payment.cs",
@@ -1091,7 +1095,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 12,
               "Title": "ApiService.cs",
               "DocumentMoniker": "B:\\Project c\u00E1 nh\u00E2n\\BookStoreOnline\\BookStoreOnline.MVC\\Services\\ApiService.cs",
               "RelativeDocumentMoniker": "BookStoreOnline.MVC\\Services\\ApiService.cs",
@@ -1103,7 +1107,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 11,
               "Title": "IApiService.cs",
               "DocumentMoniker": "B:\\Project c\u00E1 nh\u00E2n\\BookStoreOnline\\BookStoreOnline.MVC\\Services\\IApiService.cs",
               "RelativeDocumentMoniker": "BookStoreOnline.MVC\\Services\\IApiService.cs",
@@ -1115,7 +1119,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 21,
+              "DocumentIndex": 22,
               "Title": "UsersController.cs",
               "DocumentMoniker": "B:\\Project c\u00E1 nh\u00E2n\\BookStoreOnline\\BookStoreOnline.API\\Controllers\\UsersController.cs",
               "RelativeDocumentMoniker": "BookStoreOnline.API\\Controllers\\UsersController.cs",
@@ -1127,7 +1131,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 20,
+              "DocumentIndex": 21,
               "Title": "WeatherForecastController.cs",
               "DocumentMoniker": "B:\\Project c\u00E1 nh\u00E2n\\BookStoreOnline\\BookStoreOnline.API\\Controllers\\WeatherForecastController.cs",
               "RelativeDocumentMoniker": "BookStoreOnline.API\\Controllers\\WeatherForecastController.cs",
@@ -1139,7 +1143,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 22,
+              "DocumentIndex": 23,
               "Title": "Index.cshtml",
               "DocumentMoniker": "B:\\Project c\u00E1 nh\u00E2n\\BookStoreOnline\\BookStoreOnline.MVC\\Views\\Home\\Index.cshtml",
               "RelativeDocumentMoniker": "BookStoreOnline.MVC\\Views\\Home\\Index.cshtml",
@@ -1151,7 +1155,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 23,
+              "DocumentIndex": 24,
               "Title": "BookStoreOnline.API.http",
               "DocumentMoniker": "B:\\Project c\u00E1 nh\u00E2n\\BookStoreOnline\\BookStoreOnline.API\\BookStoreOnline.API.http",
               "RelativeDocumentMoniker": "BookStoreOnline.API\\BookStoreOnline.API.http",
@@ -1163,7 +1167,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
               "Title": "appsettings.json",
               "DocumentMoniker": "B:\\Project c\u00E1 nh\u00E2n\\BookStoreOnline\\BookStoreOnline.API\\appsettings.json",
               "RelativeDocumentMoniker": "BookStoreOnline.API\\appsettings.json",
@@ -1175,7 +1179,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
+              "DocumentIndex": 15,
               "Title": "ApplicationDbContext.cs",
               "DocumentMoniker": "B:\\Project c\u00E1 nh\u00E2n\\BookStoreOnline\\BookStoreOnline.API\\Models\\ApplicationDbContext.cs",
               "RelativeDocumentMoniker": "BookStoreOnline.API\\Models\\ApplicationDbContext.cs",
@@ -1187,7 +1191,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 19,
+              "DocumentIndex": 20,
               "Title": "OrderDetail.cs",
               "DocumentMoniker": "B:\\Project c\u00E1 nh\u00E2n\\BookStoreOnline\\BookStoreOnline.API\\Models\\OrderDetail.cs",
               "RelativeDocumentMoniker": "BookStoreOnline.API\\Models\\OrderDetail.cs",
@@ -1199,7 +1203,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
+              "DocumentIndex": 14,
               "Title": "Order.cs",
               "DocumentMoniker": "B:\\Project c\u00E1 nh\u00E2n\\BookStoreOnline\\BookStoreOnline.API\\Models\\Order.cs",
               "RelativeDocumentMoniker": "BookStoreOnline.API\\Models\\Order.cs",
@@ -1211,7 +1215,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 24,
+              "DocumentIndex": 25,
               "Title": "Book.cs",
               "DocumentMoniker": "B:\\Project c\u00E1 nh\u00E2n\\BookStoreOnline\\BookStoreOnline.API\\Models\\Book.cs",
               "RelativeDocumentMoniker": "BookStoreOnline.API\\Models\\Book.cs",
@@ -1223,7 +1227,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 25,
+              "DocumentIndex": 26,
               "Title": "Category.cs",
               "DocumentMoniker": "B:\\Project c\u00E1 nh\u00E2n\\BookStoreOnline\\BookStoreOnline.API\\Models\\Category.cs",
               "RelativeDocumentMoniker": "BookStoreOnline.API\\Models\\Category.cs",
@@ -1303,7 +1307,7 @@
         },
         {
           "DockedWidth": 1304,
-          "SelectedChildIndex": -1,
+          "SelectedChildIndex": 29,
           "Children": [
             {
               "$type": "Bookmark",
@@ -1420,6 +1424,23 @@
             {
               "$type": "Bookmark",
               "Name": "ST:22:0:{e8034f19-ab72-4f06-83fd-f6832b41aa63}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "20260321184222_InitialCreate3.cs",
+              "DocumentMoniker": "B:\\Project c\u00E1 nh\u00E2n\\BookStoreOnline\\BookStoreOnline.API\\Migrations\\20260321184222_InitialCreate3.cs",
+              "RelativeDocumentMoniker": "BookStoreOnline.API\\Migrations\\20260321184222_InitialCreate3.cs",
+              "ToolTip": "B:\\Project c\u00E1 nh\u00E2n\\BookStoreOnline\\BookStoreOnline.API\\Migrations\\20260321184222_InitialCreate3.cs",
+              "RelativeToolTip": "BookStoreOnline.API\\Migrations\\20260321184222_InitialCreate3.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-21T18:42:23.013Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{0ad07096-bba9-4900-a651-0598d26f6d24}"
             }
           ]
         }

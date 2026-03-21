@@ -627,6 +627,11 @@
                 <i class="bi bi-receipt"></i>
                 Đơn hàng
             </a>
+            <a asp-controller="Admin" asp-action="Discounts"
+               class="sidebar-nav-item @(new[]{"Discounts","DiscountCreate","DiscountEdit"}.Contains(ViewContext.RouteData.Values["action"]?.ToString()) ? "active" : "")">
+                <i class="bi bi-tag-fill"></i>
+                Giảm giá
+            </a>
         </div>
 
         <div class="sidebar-section">
@@ -669,6 +674,20 @@
         <header class="admin-topbar">
             <span class="topbar-title">@ViewData["Title"]</span>
             <div class="topbar-actions">
+                <!-- Admin Bell Notification -->
+                <div class="admin-bell-wrap" style="position:relative">
+                    <button id="adminBellBtn" class="btn-topbar" onclick="toggleOrderPanel()" title="Đơn hàng mới" style="position:relative">
+                        <i class="bi bi-bell-fill"></i>
+                        <span id="adminBellBadge" style="display:none;position:absolute;top:-4px;right:-4px;background:#ef4444;color:#fff;font-size:.65rem;font-weight:700;border-radius:50%;width:18px;height:18px;line-height:18px;text-align:center">0</span>
+                    </button>
+                    <div id="adminOrderPanel" style="display:none;position:absolute;top:calc(100% + 10px);right:0;width:300px;background:#1e2130;border:1px solid rgba(255,255,255,.1);border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.5);z-index:999;overflow:hidden">
+                        <div style="padding:.85rem 1.1rem;border-bottom:1px solid rgba(255,255,255,.07);font-weight:600;font-size:.85rem;color:#e2e8f0;display:flex;align-items:center;justify-content:space-between">
+                            <span>📦 Đơn hàng chờ xử lý</span>
+                            <a asp-action="Orders" asp-route-status="Pending" style="font-size:.75rem;color:#818cf8;text-decoration:none">Xem tất cả</a>
+                        </div>
+                        <div id="adminOrderList" style="max-height:220px;overflow-y:auto;padding:.5rem"></div>
+                    </div>
+                </div>
                 <a asp-controller="Home" asp-action="Index" class="btn-topbar">
                     <i class="bi bi-shop"></i> Cửa hàng
                 </a>
@@ -753,5 +772,84 @@
     </div>
 
     @await RenderSectionAsync("Scripts", required: false)
+    <!-- SignalR CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+    <script>
+        // ===== ADMIN REALTIME ORDER NOTIFICATION =====
+        var adminConnection = new signalR.HubConnectionBuilder()
+            .withUrl("/hubs/orders")
+            .withAutomaticReconnect()
+            .build();
+
+        var adminPendingCount = 0;
+        var adminOrderPanel = false;
+
+        adminConnection.on("NewOrderAlert", function(data) {
+            adminPendingCount++;
+            updateAdminBell(adminPendingCount);
+            showAdminOrderToast(data);
+            loadPendingOrderList();
+        });
+
+        adminConnection.start().then(function() {
+            adminConnection.invoke("JoinAdminGroup");
+            loadPendingOrderCount();
+        }).catch(function(err) { console.warn("SignalR admin error:", err); });
+
+        function loadPendingOrderCount() {
+            fetch('/Admin/GetPendingOrderCount')
+                .then(r => r.json())
+                .then(d => { adminPendingCount = d.count; updateAdminBell(adminPendingCount); })
+                .catch(() => {});
+        }
+
+        function updateAdminBell(count) {
+            var badge = document.getElementById('adminBellBadge');
+            if (count > 0) {
+                badge.textContent = count > 9 ? '9+' : count;
+                badge.style.display = 'block';
+                document.getElementById('adminBellBtn').style.color = '#f59e0b';
+            } else {
+                badge.style.display = 'none';
+                document.getElementById('adminBellBtn').style.color = '';
+            }
+        }
+
+        function toggleOrderPanel() {
+            var panel = document.getElementById('adminOrderPanel');
+            adminOrderPanel = !adminOrderPanel;
+            panel.style.display = adminOrderPanel ? 'block' : 'none';
+            if (adminOrderPanel) loadPendingOrderList();
+        }
+
+        function loadPendingOrderList() {
+            var list = document.getElementById('adminOrderList');
+            fetch('/Admin/Orders?status=Pending')
+                .catch(() => {});
+            list.innerHTML = '<div style="padding:1rem;text-align:center;color:#94a3b8;font-size:.82rem">&#128279; <a href="/Admin/Orders?status=Pending" style="color:#818cf8">Xem danh sách đơn Pending</a></div>';
+        }
+
+        function showAdminOrderToast(data) {
+            var container = document.createElement('div');
+            container.className = 'admin-toast-container';
+            container.style.cssText = 'position:fixed;bottom:2rem;right:2rem;z-index:9999';
+            container.innerHTML = '<div class="admin-toast success" style="min-width:320px">' +
+                '<i class="bi bi-bag-check-fill" style="color:#f59e0b"></i>' +
+                '<div><div style="font-weight:600;font-size:.9rem">Đơn hàng mới!</div>' +
+                '<div style="font-size:.8rem;opacity:.8">' + (data.message || 'Đƣn hàng mới cần xử lý') + '</div></div>' +
+                '<button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:inherit;cursor:pointer;margin-left:auto"><i class="bi bi-x-lg"></i></button>' +
+                '</div>';
+            document.body.appendChild(container);
+            setTimeout(() => container.remove(), 6000);
+        }
+
+        // Close panel when clicking outside
+        document.addEventListener('click', function(e) {
+            if (adminOrderPanel && !e.target.closest('.admin-bell-wrap')) {
+                document.getElementById('adminOrderPanel').style.display = 'none';
+                adminOrderPanel = false;
+            }
+        });
+    </script>
 </body>
 </html>

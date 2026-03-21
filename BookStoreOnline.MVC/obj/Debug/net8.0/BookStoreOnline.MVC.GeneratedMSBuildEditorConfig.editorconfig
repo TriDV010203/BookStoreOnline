@@ -64,6 +64,18 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cQ2F0ZWdvcnlFZGl0LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[B:/Project cá nhân/BookStoreOnline/BookStoreOnline.MVC/Views/Admin/DiscountCreate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cRGlzY291bnRDcmVhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[B:/Project cá nhân/BookStoreOnline/BookStoreOnline.MVC/Views/Admin/DiscountEdit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cRGlzY291bnRFZGl0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[B:/Project cá nhân/BookStoreOnline/BookStoreOnline.MVC/Views/Admin/Discounts.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cRGlzY291bnRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
 [B:/Project cá nhân/BookStoreOnline/BookStoreOnline.MVC/Views/Admin/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 

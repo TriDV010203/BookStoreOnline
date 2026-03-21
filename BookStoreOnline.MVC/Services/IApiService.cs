@@ -45,5 +45,20 @@ namespace BookStoreOnline.MVC.Services
         Task<List<ReviewViewModel>> GetAllReviewsAsync();
         Task<(bool canReview, bool hasPurchased, bool hasReviewed)> CanReviewAsync(int userId, int bookId);
         Task<(bool success, string message)> CreateReviewAsync(CreateReviewViewModel model);
+
+        // ===== DISCOUNTS =====
+        Task<List<DiscountViewModel>> GetDiscountsAsync();
+        Task<DiscountViewModel?> GetDiscountByIdAsync(int id);
+        Task<decimal> GetDiscountPercentForBookAsync(int bookId);
+        Task<(bool success, string message)> CreateDiscountAsync(DiscountCreateViewModel model);
+        Task<(bool success, string message)> UpdateDiscountAsync(int id, DiscountCreateViewModel model);
+        Task<(bool success, string message)> DeleteDiscountAsync(int id);
+
+        // ===== NOTIFICATIONS =====
+        Task<List<UserNotificationViewModel>> GetUserNotificationsAsync(int userId);
+        Task<int> GetUnreadNotificationCountAsync(int userId);
+        Task<bool> MarkNotificationReadAsync(int notificationId);
+        Task<bool> MarkAllNotificationsReadAsync(int userId);
+        Task<bool> BroadcastDiscountNotificationAsync(string title, string? message);
     }
 }

@@ -1,3 +1,4 @@
+using BookStoreOnline.MVC.Hubs;
 using BookStoreOnline.MVC.Services;
 
 namespace BookStoreOnline.MVC
@@ -10,6 +11,7 @@ namespace BookStoreOnline.MVC
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+            builder.Services.AddSignalR();
 
             // Đăng ký Session
             builder.Services.AddSession(options =>
@@ -49,6 +51,8 @@ namespace BookStoreOnline.MVC
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
+
+            app.MapHub<OrderNotificationHub>("/hubs/orders");
 
             app.Run();
         }

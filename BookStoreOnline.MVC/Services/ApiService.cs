@@ -599,5 +599,188 @@ namespace BookStoreOnline.MVC.Services
             public bool Cancelled { get; set; }
             public string Status { get; set; } = "";
         }
+
+        // =====================================================================
+        // DISCOUNTS
+        // =====================================================================
+
+        public async Task<List<DiscountViewModel>> GetDiscountsAsync()
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync("api/discounts");
+                if (response.IsSuccessStatusCode)
+                    return await response.Content.ReadFromJsonAsync<List<DiscountViewModel>>(_jsonOptions) ?? new();
+                return new();
+            }
+            catch { return new(); }
+        }
+
+        public async Task<DiscountViewModel?> GetDiscountByIdAsync(int id)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"api/discounts/{id}");
+                if (response.IsSuccessStatusCode)
+                    return await response.Content.ReadFromJsonAsync<DiscountViewModel>(_jsonOptions);
+                return null;
+            }
+            catch { return null; }
+        }
+
+        public async Task<decimal> GetDiscountPercentForBookAsync(int bookId)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"api/discounts/for-book/{bookId}");
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = await response.Content.ReadFromJsonAsync<DiscountPercentResult>(_jsonOptions);
+                    return result?.DiscountPercent ?? 0;
+                }
+                return 0;
+            }
+            catch { return 0; }
+        }
+
+        public async Task<(bool success, string message)> CreateDiscountAsync(DiscountCreateViewModel model)
+        {
+            try
+            {
+                var categoryIdsStr = model.ApplyToAll ? null : string.Join(",", model.SelectedCategoryIds);
+                var payload = new
+                {
+                    name = model.Name,
+                    discountPercent = model.DiscountPercent,
+                    startDate = model.StartDate,
+                    endDate = model.EndDate,
+                    applyToAll = model.ApplyToAll,
+                    categoryIds = categoryIdsStr,
+                    description = model.Description,
+                    isActive = model.IsActive
+                };
+                var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
+                var response = await _httpClient.PostAsync("api/discounts", content);
+                if (response.IsSuccessStatusCode)
+                    return (true, "Tạo chương trình giảm giá thành công!");
+                var err = await response.Content.ReadAsStringAsync();
+                return (false, err.Trim('"'));
+            }
+            catch (Exception ex) { return (false, $"Lỗi kết nối: {ex.Message}"); }
+        }
+
+        public async Task<(bool success, string message)> UpdateDiscountAsync(int id, DiscountCreateViewModel model)
+        {
+            try
+            {
+                var categoryIdsStr = model.ApplyToAll ? null : string.Join(",", model.SelectedCategoryIds);
+                var payload = new
+                {
+                    id,
+                    name = model.Name,
+                    discountPercent = model.DiscountPercent,
+                    startDate = model.StartDate,
+                    endDate = model.EndDate,
+                    applyToAll = model.ApplyToAll,
+                    categoryIds = categoryIdsStr,
+                    description = model.Description,
+                    isActive = model.IsActive
+                };
+                var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
+                var response = await _httpClient.PutAsync($"api/discounts/{id}", content);
+                if (response.IsSuccessStatusCode)
+                    return (true, "Cập nhật chương trình giảm giá thành công!");
+                var err = await response.Content.ReadAsStringAsync();
+                return (false, err.Trim('"'));
+            }
+            catch (Exception ex) { return (false, $"Lỗi kết nối: {ex.Message}"); }
+        }
+
+        public async Task<(bool success, string message)> DeleteDiscountAsync(int id)
+        {
+            try
+            {
+                var response = await _httpClient.DeleteAsync($"api/discounts/{id}");
+                if (response.IsSuccessStatusCode)
+                    return (true, "Đã xóa chương trình giảm giá!");
+                return (false, "Không thể xóa.");
+            }
+            catch (Exception ex) { return (false, $"Lỗi kết nối: {ex.Message}"); }
+        }
+
+        // =====================================================================
+        // NOTIFICATIONS
+        // =====================================================================
+
+        public async Task<List<UserNotificationViewModel>> GetUserNotificationsAsync(int userId)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"api/notifications/user/{userId}");
+                if (response.IsSuccessStatusCode)
+                    return await response.Content.ReadFromJsonAsync<List<UserNotificationViewModel>>(_jsonOptions) ?? new();
+                return new();
+            }
+            catch { return new(); }
+        }
+
+        public async Task<int> GetUnreadNotificationCountAsync(int userId)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"api/notifications/user/{userId}/unread-count");
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = await response.Content.ReadFromJsonAsync<UnreadCountResult>(_jsonOptions);
+                    return result?.Count ?? 0;
+                }
+                return 0;
+            }
+            catch { return 0; }
+        }
+
+        public async Task<bool> MarkNotificationReadAsync(int notificationId)
+        {
+            try
+            {
+                var content = new StringContent("{}", Encoding.UTF8, "application/json");
+                var response = await _httpClient.PatchAsync($"api/notifications/{notificationId}/read", content);
+                return response.IsSuccessStatusCode;
+            }
+            catch { return false; }
+        }
+
+        public async Task<bool> MarkAllNotificationsReadAsync(int userId)
+        {
+            try
+            {
+                var content = new StringContent("{}", Encoding.UTF8, "application/json");
+                var response = await _httpClient.PatchAsync($"api/notifications/user/{userId}/read-all", content);
+                return response.IsSuccessStatusCode;
+            }
+            catch { return false; }
+        }
+
+        public async Task<bool> BroadcastDiscountNotificationAsync(string title, string? message)
+        {
+            try
+            {
+                var payload = new { title, message };
+                var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
+                var response = await _httpClient.PostAsync("api/notifications/broadcast", content);
+                return response.IsSuccessStatusCode;
+            }
+            catch { return false; }
+        }
+
+        private class DiscountPercentResult
+        {
+            public decimal DiscountPercent { get; set; }
+        }
+
+        private class UnreadCountResult
+        {
+            public int Count { get; set; }
+        }
     }
 }

@@ -1,0 +1,98 @@
+@model BookStoreOnline.MVC.Models.DiscountCreateViewModel
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Sửa Giảm giá";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold mb-0" style="color:var(--text-primary)">✏️ Sửa chương trình giảm giá</h2>
+    </div>
+    <a asp-action="Discounts" class="btn-admin-secondary"><i class="bi bi-arrow-left"></i> Quay lại</a>
+</div>
+
+<div class="admin-card" style="max-width:720px">
+    <form asp-action="DiscountEdit" asp-route-id="@Model.Id" method="post">
+        @Html.AntiForgeryToken()
+
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-3"></div>
+
+        <div class="mb-3">
+            <label asp-for="Name" class="form-label fw-semibold"></label>
+            <input asp-for="Name" class="admin-input" />
+            <span asp-validation-for="Name" class="text-danger small"></span>
+        </div>
+
+        <div class="row g-3 mb-3">
+            <div class="col-md-4">
+                <label asp-for="DiscountPercent" class="form-label fw-semibold"></label>
+                <div class="input-group">
+                    <input asp-for="DiscountPercent" class="admin-input" type="number" min="0.01" max="100" step="0.01" />
+                    <span class="admin-input-addon">%</span>
+                </div>
+                <span asp-validation-for="DiscountPercent" class="text-danger small"></span>
+            </div>
+            <div class="col-md-4">
+                <label asp-for="StartDate" class="form-label fw-semibold"></label>
+                <input asp-for="StartDate" class="admin-input" type="date" />
+            </div>
+            <div class="col-md-4">
+                <label asp-for="EndDate" class="form-label fw-semibold"></label>
+                <input asp-for="EndDate" class="admin-input" type="date" />
+                <div class="form-text" style="color:var(--text-muted);font-size:.78rem">Để trống = vĩnh viễn</div>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <div class="form-check form-switch mb-2">
+                <input asp-for="ApplyToAll" class="form-check-input" id="applyToAll" onchange="toggleCategories(this.checked)" />
+                <label class="form-check-label fw-semibold" for="applyToAll">Áp dụng cho tất cả sách</label>
+            </div>
+
+            <div id="categorySection">
+                <label class="form-label fw-semibold">Chọn danh mục áp dụng</label>
+                <div class="d-flex flex-wrap gap-2">
+                    @foreach (var cat in Model.Categories)
+                    {
+                        <div class="form-check" style="background:var(--surface-2);padding:.5rem 1rem;border-radius:8px;border:1px solid var(--border)">
+                            <input class="form-check-input" type="checkbox" name="SelectedCategoryIds" value="@cat.Id" id="cat-@cat.Id"
+                                   @(Model.SelectedCategoryIds.Contains(cat.Id) ? "checked" : "") />
+                            <label class="form-check-label" for="cat-@cat.Id">@cat.Name</label>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Description" class="form-label fw-semibold"></label>
+            <textarea asp-for="Description" class="admin-input" rows="2" placeholder="Nội dung thông báo gửi tới người dùng (tùy chọn)..."></textarea>
+        </div>
+
+        <div class="mb-4">
+            <div class="form-check form-switch">
+                <input asp-for="IsActive" class="form-check-input" />
+                <label asp-for="IsActive" class="form-check-label fw-semibold">Kích hoạt</label>
+            </div>
+        </div>
+
+        <button type="submit" class="btn-admin-primary"><i class="bi bi-check-lg"></i> Lưu thay đổi</button>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function toggleCategories(isAll) {
+            document.getElementById('categorySection').style.display = isAll ? 'none' : 'block';
+        }
+        toggleCategories(document.getElementById('applyToAll').checked);
+    </script>
+    <style>
+        .admin-input { width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:.6rem .85rem;color:var(--text-primary);outline:none;transition:border .2s; }
+        .admin-input:focus { border-color:var(--accent); }
+        .admin-input-addon { background:var(--surface-3);border:1px solid var(--border);border-left:none;border-radius:0 8px 8px 0;padding:.6rem .85rem;color:var(--text-muted); }
+        .input-group { display:flex; }
+        .input-group .admin-input { border-radius:8px 0 0 8px; }
+    </style>
+}

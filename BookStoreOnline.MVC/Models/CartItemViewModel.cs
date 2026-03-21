@@ -6,7 +6,9 @@ namespace BookStoreOnline.MVC.Models
         public string Title { get; set; } = string.Empty;
         public string Author { get; set; } = string.Empty;
         public string? ImageUrl { get; set; }
-        public decimal UnitPrice { get; set; }
+        public decimal OriginalPrice { get; set; }  // Giá gốc
+        public decimal UnitPrice { get; set; }       // Giá sau giảm
+        public decimal DiscountPercent { get; set; } // 0 = không giảm
         public int Quantity { get; set; }
         public int StockQuantity { get; set; }
         public decimal SubTotal => UnitPrice * Quantity;

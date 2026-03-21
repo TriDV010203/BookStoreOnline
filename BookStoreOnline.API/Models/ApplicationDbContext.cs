@@ -16,8 +16,9 @@ namespace BookStoreOnline.API.Models // Sửa namespace này nếu bạn bỏ fi
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderDetail> OrderDetails { get; set; }
         public DbSet<ProductReview> ProductReviews { get; set; }
-
         public DbSet<Payment> Payments { get; set; }
+        public DbSet<Discount> Discounts { get; set; }
+        public DbSet<UserNotification> UserNotifications { get; set; }
         // Cấu hình thêm các hành vi của Database (nếu cần)
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -15,5 +15,11 @@ namespace BookStoreOnline.MVC.Models
         // Populated from reviews
         public double AverageRating { get; set; }
         public int ReviewCount { get; set; }
+
+        // Discount
+        public decimal DiscountPercent { get; set; } = 0;
+        public decimal? DiscountedPrice => DiscountPercent > 0
+            ? Math.Round(Price * (1 - DiscountPercent / 100), 0)
+            : null;
     }
 }

@@ -85,6 +85,50 @@ namespace BookStoreOnline.API.Migrations
                     b.ToTable("Categories");
                 });
 
+            modelBuilder.Entity("BookStoreOnline.API.Models.Discount", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("ApplyToAll")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("CategoryIds")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<decimal>("DiscountPercent")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Discounts");
+                });
+
             modelBuilder.Entity("BookStoreOnline.API.Models.Order", b =>
                 {
                     b.Property<int>("Id")
@@ -257,6 +301,44 @@ namespace BookStoreOnline.API.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("BookStoreOnline.API.Models.UserNotification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Message")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserNotifications");
+                });
+
             modelBuilder.Entity("BookStoreOnline.API.Models.Book", b =>
                 {
                     b.HasOne("BookStoreOnline.API.Models.Category", "Category")
@@ -313,6 +395,17 @@ namespace BookStoreOnline.API.Migrations
                         .IsRequired();
 
                     b.Navigation("Book");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BookStoreOnline.API.Models.UserNotification", b =>
+                {
+                    b.HasOne("BookStoreOnline.API.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });
