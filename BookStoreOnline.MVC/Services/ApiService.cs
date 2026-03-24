@@ -62,6 +62,7 @@ namespace BookStoreOnline.MVC.Services
                     author = model.Author,
                     description = model.Description,
                     price = model.Price,
+                    importPrice = model.ImportPrice,
                     stockQuantity = model.StockQuantity,
                     imageUrl = model.ImageUrl,
                     categoryId = model.CategoryId
@@ -87,6 +88,7 @@ namespace BookStoreOnline.MVC.Services
                     author = model.Author,
                     description = model.Description,
                     price = model.Price,
+                    importPrice = model.ImportPrice,
                     stockQuantity = model.StockQuantity,
                     imageUrl = model.ImageUrl,
                     categoryId = model.CategoryId
@@ -114,8 +116,48 @@ namespace BookStoreOnline.MVC.Services
         }
 
         // =====================================================================
+        // DASHBOARD
+        // =====================================================================
+
+        public async Task<DashboardRevenueViewModel> GetDashboardRevenueAsync(int? year = null)
+        {
+            try
+            {
+                var url = year.HasValue ? $"api/dashboard/revenue?year={year}" : "api/dashboard/revenue";
+                var response = await _httpClient.GetAsync(url);
+                if (response.IsSuccessStatusCode)
+                {
+                    var dto = await response.Content.ReadFromJsonAsync<DashboardDto>(_jsonOptions);
+                    if (dto != null)
+                        return new DashboardRevenueViewModel
+                        {
+                            Year = dto.Year,
+                            TotalRevenue = dto.TotalRevenue,
+                            TotalProfit = dto.TotalProfit,
+                            TotalOrders = dto.TotalOrders,
+                            MonthlyRevenue = dto.MonthlyRevenue?.Select(m => new MonthlyRevenueItem
+                            {
+                                Month = m.Month,
+                                Revenue = m.Revenue,
+                                Profit = m.Profit
+                            }).ToList() ?? new(),
+                            CategoryStats = dto.CategoryStats?.Select(c => new CategoryStatItem
+                            {
+                                CategoryName = c.CategoryName,
+                                SoldQty = c.SoldQty,
+                                Revenue = c.Revenue
+                            }).ToList() ?? new()
+                        };
+                }
+            }
+            catch { }
+            return new DashboardRevenueViewModel { Year = year ?? DateTime.Now.Year };
+        }
+
+        // =====================================================================
         // CATEGORIES
         // =====================================================================
+
 
         public async Task<List<CategoryViewModel>> GetCategoriesAsync()
         {
@@ -598,6 +640,30 @@ namespace BookStoreOnline.MVC.Services
         {
             public bool Cancelled { get; set; }
             public string Status { get; set; } = "";
+        }
+
+        private class DashboardDto
+        {
+            public int Year { get; set; }
+            public decimal TotalRevenue { get; set; }
+            public decimal TotalProfit { get; set; }
+            public int TotalOrders { get; set; }
+            public List<DashboardMonthDto>? MonthlyRevenue { get; set; }
+            public List<DashboardCategoryDto>? CategoryStats { get; set; }
+        }
+
+        private class DashboardMonthDto
+        {
+            public int Month { get; set; }
+            public decimal Revenue { get; set; }
+            public decimal Profit { get; set; }
+        }
+
+        private class DashboardCategoryDto
+        {
+            public string CategoryName { get; set; } = "";
+            public int SoldQty { get; set; }
+            public decimal Revenue { get; set; }
         }
 
         // =====================================================================

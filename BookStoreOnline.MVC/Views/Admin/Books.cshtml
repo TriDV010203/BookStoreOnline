@@ -35,7 +35,8 @@
                     <th>Tiêu đề</th>
                     <th>Tác giả</th>
                     <th>Danh mục</th>
-                    <th>Giá</th>
+                    <th>Giá Bán</th>
+                    <th>Giá Nhập</th>
                     <th>Kho</th>
                     <th style="width:160px;">Thao tác</th>
                 </tr>
@@ -67,6 +68,9 @@
                         <td><span class="badge-admin badge-primary">@(book.CategoryName ?? "N/A")</span></td>
                         <td style="color:var(--warning);font-weight:600;white-space:nowrap;">
                             @book.Price.ToString("N0") ₫
+                        </td>
+                        <td style="color:var(--text-muted);font-size:0.85rem;white-space:nowrap;">
+                            @book.ImportPrice.ToString("N0") ₫
                         </td>
                         <td>
                             @if (book.StockQuantity > 0)

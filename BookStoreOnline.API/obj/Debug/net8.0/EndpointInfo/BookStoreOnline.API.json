@@ -375,6 +375,28 @@
         }
       }
     },
+    "/api/Dashboard/revenue": {
+      "get": {
+        "tags": [
+          "Dashboard"
+        ],
+        "parameters": [
+          {
+            "name": "year",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/Discounts": {
       "get": {
         "tags": [
@@ -1652,6 +1674,10 @@
             "type": "string"
           },
           "price": {
+            "type": "number",
+            "format": "double"
+          },
+          "importPrice": {
             "type": "number",
             "format": "double"
           },

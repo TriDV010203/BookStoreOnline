@@ -22,8 +22,12 @@ namespace BookStoreOnline.MVC.Models
 
         [Required(ErrorMessage = "Giá tiền không được để trống")]
         [Range(0, 99999999, ErrorMessage = "Giá phải lớn hơn 0")]
-        [Display(Name = "Giá (VNĐ)")]
+        [Display(Name = "Giá Bán (VNĐ)")]
         public decimal Price { get; set; }
+
+        [Range(0, 99999999, ErrorMessage = "Giá nhập không hợp lệ")]
+        [Display(Name = "Giá Nhập (VNĐ)")]
+        public decimal ImportPrice { get; set; } = 0;
 
         [Range(0, int.MaxValue, ErrorMessage = "Số lượng không được âm")]
         [Display(Name = "Số lượng tồn kho")]

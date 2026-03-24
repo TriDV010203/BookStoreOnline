@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BookStoreOnline.API.Models
@@ -22,6 +22,9 @@ namespace BookStoreOnline.API.Models
         [Required]
         [Column(TypeName = "decimal(18,2)")] // Định dạng tiền tệ trong SQL Server
         public decimal Price { get; set; }
+
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal ImportPrice { get; set; } = 0; // Giá nhập sách (để tính lợi nhuận)
 
         public int StockQuantity { get; set; }
 

@@ -11,6 +11,9 @@ namespace BookStoreOnline.MVC.Services
         Task<(bool success, string message)> UpdateBookAsync(int id, BookCreateViewModel model);
         Task<(bool success, string message)> DeleteBookAsync(int id);
 
+        // ===== DASHBOARD =====
+        Task<DashboardRevenueViewModel> GetDashboardRevenueAsync(int? year = null);
+
         // ===== CATEGORIES =====
         Task<List<CategoryViewModel>> GetCategoriesAsync();
         Task<CategoryViewModel?> GetCategoryByIdAsync(int id);

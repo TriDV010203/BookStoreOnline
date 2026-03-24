@@ -1,3 +1,4 @@
+@using BookStoreOnline.MVC.Models
 @{
     ViewData["Title"] = "Dashboard";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
@@ -5,17 +6,35 @@
     var totalBooks = (int)(ViewData["TotalBooks"] ?? 0);
     var totalCategories = (int)(ViewData["TotalCategories"] ?? 0);
     var totalStock = (int)(ViewData["TotalStock"] ?? 0);
+    var totalOrders = (int)(ViewData["TotalOrders"] ?? 0);
+    var totalUsers = (int)(ViewData["TotalUsers"] ?? 0);
     var recentBooks = ViewData["RecentBooks"] as List<BookStoreOnline.MVC.Models.BookViewModel> ?? new();
+    var revenue = ViewData["DashboardRevenue"] as DashboardRevenueViewModel ?? new();
+
+    // Prepare JSON for Chart.js
+    var monthLabels = "[\"T1\",\"T2\",\"T3\",\"T4\",\"T5\",\"T6\",\"T7\",\"T8\",\"T9\",\"T10\",\"T11\",\"T12\"]";
+    var revenueData = "[" + string.Join(",", Enumerable.Range(1, 12).Select(m => {
+        var item = revenue.MonthlyRevenue.FirstOrDefault(x => x.Month == m);
+        return item?.Revenue.ToString("F0", System.Globalization.CultureInfo.InvariantCulture) ?? "0";
+    })) + "]";
+    var profitData = "[" + string.Join(",", Enumerable.Range(1, 12).Select(m => {
+        var item = revenue.MonthlyRevenue.FirstOrDefault(x => x.Month == m);
+        return item?.Profit.ToString("F0", System.Globalization.CultureInfo.InvariantCulture) ?? "0";
+    })) + "]";
+
+    var catLabels = "[" + string.Join(",", revenue.CategoryStats.Select(c => $"\"{c.CategoryName}\"")) + "]";
+    var catData   = "[" + string.Join(",", revenue.CategoryStats.Select(c => c.SoldQty)) + "]";
 }
 
-<!-- Stat Cards -->
+<!-- Page Header -->
 <div class="page-header">
     <div>
         <div class="page-header-title">📊 Dashboard</div>
-        <div class="page-header-sub">Chào mừng trở lại, @Context.Session.GetString("UserFullName")!</div>
+        <div class="page-header-sub">Chào mừng trở lại, @Context.Session.GetString("UserFullName")! · @revenue.Year</div>
     </div>
 </div>
 
+<!-- ===== STAT CARDS ===== -->
 <div class="row g-4 mb-4">
     <div class="col-md-4">
         <div class="stat-card primary">
@@ -45,9 +64,75 @@
             <span style="font-size:0.78rem; color: var(--text-muted);">Cuốn sách</span>
         </div>
     </div>
+    <div class="col-md-4">
+        <div class="stat-card" style="background:linear-gradient(135deg,rgba(16,185,129,0.12),rgba(5,150,105,0.06));border:1px solid rgba(16,185,129,0.25);">
+            <i class="bi bi-people stat-icon" style="color:#10b981;"></i>
+            <div class="stat-label">Thành viên</div>
+            <div class="stat-value" style="color:#10b981;">@totalUsers</div>
+            <a asp-controller="Admin" asp-action="Users" style="font-size:0.78rem; color:#10b981; text-decoration:none;">
+                Quản lý <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card" style="background:linear-gradient(135deg,rgba(99,102,241,0.12),rgba(79,70,229,0.06));border:1px solid rgba(99,102,241,0.25);">
+            <i class="bi bi-cart-check stat-icon" style="color:#6366f1;"></i>
+            <div class="stat-label">Doanh Thu (@revenue.Year)</div>
+            <div class="stat-value" style="color:#6366f1;font-size:1.4rem;">@revenue.TotalRevenue.ToString("N0") ₫</div>
+            <span style="font-size:0.78rem; color: var(--text-muted);">@revenue.TotalOrders đơn hàng</span>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card" style="background:linear-gradient(135deg,rgba(245,158,11,0.12),rgba(217,119,6,0.06));border:1px solid rgba(245,158,11,0.25);">
+            <i class="bi bi-graph-up-arrow stat-icon" style="color:#f59e0b;"></i>
+            <div class="stat-label">Lợi Nhuận (@revenue.Year)</div>
+            <div class="stat-value" style="color:#f59e0b;font-size:1.4rem;">@revenue.TotalProfit.ToString("N0") ₫</div>
+            <span style="font-size:0.78rem; color: var(--text-muted);">= Doanh thu – Giá nhập</span>
+        </div>
+    </div>
 </div>
 
-<!-- Quick Actions -->
+<!-- ===== CHARTS ===== -->
+<div class="row g-4 mb-4">
+    <!-- Bar + Line Chart: Revenue by Month -->
+    <div class="col-lg-8">
+        <div class="admin-card" style="height:400px;">
+            <div class="admin-card-title">
+                <i class="bi bi-bar-chart-line" style="color:var(--primary-light);"></i>
+                Doanh Thu &amp; Lợi Nhuận Theo Tháng — @revenue.Year
+            </div>
+            <div style="position:relative;height:320px;">
+                <canvas id="revenueChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Doughnut Chart: Top Categories -->
+    <div class="col-lg-4">
+        <div class="admin-card" style="height:400px;">
+            <div class="admin-card-title">
+                <i class="bi bi-pie-chart" style="color:var(--primary-light);"></i>
+                Danh Mục Bán Chạy Nhất
+            </div>
+            @if (!revenue.CategoryStats.Any())
+            {
+                <div style="text-align:center;padding:3rem 1rem;color:var(--text-muted);">
+                    <i class="bi bi-inbox" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>
+                    Chưa có dữ liệu bán hàng
+                </div>
+            }
+            else
+            {
+                <div style="position:relative;height:260px;">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+                <div id="catLegend" style="margin-top:0.5rem;font-size:0.75rem;display:flex;flex-wrap:wrap;gap:4px 10px;justify-content:center;"></div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- ===== Quick Actions ===== -->
 <div class="row g-4 mb-4">
     <div class="col-md-6">
         <div class="admin-card" style="border: 1px dashed rgba(99,102,241,0.3);">
@@ -79,7 +164,7 @@
     </div>
 </div>
 
-<!-- Recent Books -->
+<!-- ===== Recent Books ===== -->
 <div class="admin-card">
     <div class="admin-card-title">
         <i class="bi bi-clock-history" style="color:var(--primary-light);"></i>
@@ -100,7 +185,8 @@
                     <th>Sách</th>
                     <th>Tác giả</th>
                     <th>Danh mục</th>
-                    <th>Giá</th>
+                    <th>Giá Bán</th>
+                    <th>Giá Nhập</th>
                     <th>Tồn kho</th>
                 </tr>
             </thead>
@@ -114,6 +200,7 @@
                         <td style="color:var(--text-muted);">@book.Author</td>
                         <td><span class="badge-admin badge-primary">@(book.CategoryName ?? "N/A")</span></td>
                         <td style="color:var(--warning);font-weight:600;">@book.Price.ToString("N0") ₫</td>
+                        <td style="color:var(--text-muted);font-size:0.85rem;">@book.ImportPrice.ToString("N0") ₫</td>
                         <td>
                             @if (book.StockQuantity > 0)
                             {
@@ -135,3 +222,130 @@
         </div>
     }
 </div>
+
+<!-- ===== Chart.js ===== -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+<script>
+    // ---- Revenue Bar+Line Chart ----
+    (function () {
+        const ctx = document.getElementById('revenueChart');
+        if (!ctx) return;
+
+        const labels = @Html.Raw(monthLabels);
+        const revenueArr = @Html.Raw(revenueData);
+        const profitArr  = @Html.Raw(profitData);
+
+        new Chart(ctx, {
+            data: {
+                labels,
+                datasets: [
+                    {
+                        type: 'bar',
+                        label: 'Doanh Thu (₫)',
+                        data: revenueArr,
+                        backgroundColor: 'rgba(99,102,241,0.55)',
+                        borderColor: 'rgba(99,102,241,0.9)',
+                        borderWidth: 1.5,
+                        borderRadius: 5,
+                        order: 2
+                    },
+                    {
+                        type: 'line',
+                        label: 'Lợi Nhuận (₫)',
+                        data: profitArr,
+                        borderColor: '#f59e0b',
+                        backgroundColor: 'rgba(245,158,11,0.15)',
+                        pointBackgroundColor: '#f59e0b',
+                        pointRadius: 4,
+                        tension: 0.35,
+                        fill: true,
+                        order: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: {
+                        labels: { color: '#94a3b8', font: { size: 12 } }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => ' ' + ctx.dataset.label + ': ' + Number(ctx.raw).toLocaleString('vi-VN') + ' ₫'
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: { color: '#64748b' },
+                        grid: { color: 'rgba(148,163,184,0.08)' }
+                    },
+                    y: {
+                        ticks: {
+                            color: '#64748b',
+                            callback: v => (v >= 1e6 ? (v / 1e6).toFixed(1) + 'M' : v >= 1e3 ? (v / 1e3).toFixed(0) + 'K' : v) + ' ₫'
+                        },
+                        grid: { color: 'rgba(148,163,184,0.08)' }
+                    }
+                }
+            }
+        });
+    })();
+
+    // ---- Category Doughnut Chart ----
+    (function () {
+        const ctx = document.getElementById('categoryChart');
+        if (!ctx) return;
+
+        const labels = @Html.Raw(catLabels.Length > 2 ? catLabels : "[]");
+        const data   = @Html.Raw(catData.Length > 2 ? catData : "[]");
+
+        if (!labels.length) return;
+
+        const palette = [
+            '#6366f1','#f59e0b','#10b981','#ef4444','#3b82f6',
+            '#a855f7','#14b8a6','#f97316'
+        ];
+
+        const chart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels,
+                datasets: [{
+                    data,
+                    backgroundColor: palette.slice(0, labels.length),
+                    borderColor: 'rgba(15,23,42,0.6)',
+                    borderWidth: 2,
+                    hoverOffset: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '62%',
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => ' ' + ctx.label + ': ' + ctx.raw + ' quyển'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Custom legend
+        const legend = document.getElementById('catLegend');
+        if (legend) {
+            labels.forEach((l, i) => {
+                const dot = `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${palette[i]};margin-right:3px;"></span>`;
+                const span = document.createElement('span');
+                span.innerHTML = dot + l;
+                span.style.color = '#94a3b8';
+                legend.appendChild(span);
+            });
+        }
+    })();
+</script>

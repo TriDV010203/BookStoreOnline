@@ -25,6 +25,7 @@ namespace BookStoreOnline.MVC.Controllers
             var categories = await _apiService.GetCategoriesAsync();
             var orders = await _apiService.GetAllOrdersAsync();
             var users = await _apiService.GetAllUsersAsync();
+            var dashboardRevenue = await _apiService.GetDashboardRevenueAsync();
 
             ViewData["TotalBooks"] = books.Count;
             ViewData["TotalCategories"] = categories.Count;
@@ -33,6 +34,7 @@ namespace BookStoreOnline.MVC.Controllers
             ViewData["TotalRevenue"] = orders.Where(o => o.OrderStatus != "Cancelled").Sum(o => o.TotalAmount);
             ViewData["TotalUsers"] = users.Count;
             ViewData["RecentBooks"] = books.Take(5).ToList();
+            ViewData["DashboardRevenue"] = dashboardRevenue;
 
             return View();
         }
@@ -185,6 +187,7 @@ namespace BookStoreOnline.MVC.Controllers
                 Author = book.Author,
                 Description = book.Description,
                 Price = book.Price,
+                ImportPrice = book.ImportPrice,
                 StockQuantity = book.StockQuantity,
                 ImageUrl = book.ImageUrl,
                 CategoryId = book.CategoryId,
